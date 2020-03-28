@@ -2,9 +2,10 @@ package model;
 
 public enum CAR
 {
-    CAR_LEVEL_01("view/resources/cars/redCarBigger.png","view/resources/lifeIndicator.png",3,1,100,false),
-    CAR_LEVEL_02("view/resources/cars/redCarBigger_02.png","view/resources/lifeIndicator.png",5,2,200,false),
-    CAR_LEVEL_03("view/resources/cars/redCarCannon.png","view/resources/lifeIndicator.png",3,5,300,false);
+    CAR_LEVEL_01("view/resources/cars/redCarBigger.png","view/resources/lifeIndicator.png",3,1,0,false,false),
+    CAR_LEVEL_02("view/resources/cars/yellowCar1.png","view/resources/lifeIndicator.png",5,2,200,false,false),
+    CAR_LEVEL_03("view/resources/cars/blueCar.png","view/resources/lifeIndicator.png",3,5,300,false,false),
+    MOTORBOAT_01("view/resources/cars/motorBoat.png","view/resources/lifeIndicator.png",5,2,500,false,true);
 
 
     String urlLifeIndicator;
@@ -13,9 +14,10 @@ public enum CAR
     int gunDemage;
     int pointsRequiredToUnlock; //trzeba dodac jakaz zaleznosc odblokowywania kolejnych pojazdow zaleznie od poziomu/ zdobytych w grze punktow
     boolean isBought;
+    boolean isBoat;
 
 
-    private CAR(String urlCar, String urlLifeIndicator, int maxHealth, int gunDemage, int pointsRequiredToUnlock, boolean isBought)
+    private CAR(String urlCar, String urlLifeIndicator, int maxHealth, int gunDemage, int pointsRequiredToUnlock, boolean isBought, boolean isBoat)
     {
         this.urlCar = urlCar;
         this.urlLifeIndicator = urlLifeIndicator;
@@ -23,6 +25,7 @@ public enum CAR
         this.gunDemage = gunDemage;
         this.pointsRequiredToUnlock = pointsRequiredToUnlock;
         this.isBought = isBought;
+        this.isBoat = isBoat;
     }
 
     public String getCarUrl()
@@ -50,7 +53,10 @@ public enum CAR
         return this.isBought;
     }
 
-    //public void setIsBoughtToTrue
+    public void setIsBoughtToTrue()
+    {
+        this.isBought=true;
+    }
 
 
 

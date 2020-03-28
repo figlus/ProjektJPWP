@@ -15,6 +15,7 @@ public class CarPicker extends HBox
     private String circleChoosen = "view/resources/circleChoosen.png";
 
     private CAR car;
+
     private boolean isCircleChoosen;
 
     private InfoLabel carStats;
