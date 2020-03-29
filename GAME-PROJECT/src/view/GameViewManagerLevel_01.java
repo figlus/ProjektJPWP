@@ -45,12 +45,7 @@ public class GameViewManagerLevel_01 extends Thread
 
 
 
-
-
-
         gameStage.show();
-
-
     }
 
     private void initializeStage()
@@ -59,6 +54,11 @@ public class GameViewManagerLevel_01 extends Thread
         gameScene = new Scene(gamePane,GAME_WIDTH,GAME_HEIGHT);
         gameStage = new Stage();
         gameStage.setScene(gameScene);
+    }
+
+    private void createGameLoop()
+    {
+
     }
 
 
