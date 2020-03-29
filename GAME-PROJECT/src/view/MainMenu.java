@@ -1,7 +1,9 @@
 package view;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -13,6 +15,7 @@ import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFrame;
 
 public class MainMenu
 {
@@ -39,6 +42,7 @@ public class MainMenu
     private InfoLabel totalCollectedPointsLabel;
     private int totalCollectedPointsValue;
 
+    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
 
     public MainMenu() throws FileNotFoundException
@@ -58,6 +62,9 @@ public class MainMenu
 
 
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
+
+
+
 
 
 
@@ -89,16 +96,26 @@ public class MainMenu
                         car.setIsCircleChoosen(false);
                     }
 
-
+                    //musimy najpierw wybrac jakis samochod zeby sprawdzic czy nas na niego stac
                     carToPick.setIsCircleChoosen(true);
                     pickedCar = carToPick.getCar();
-                    if(totalCollectedPointsValue >= pickedCar.getPointsRequiredToUnlock() && pickedCar.getIsBought()==false)
+                    //if there is not enough points to buy better car we will use basic car LATER
+                    if(totalCollectedPointsValue >= pickedCar.getPointsRequiredToUnlock() )
                     {
                         carToPick.setIsCircleChoosen(true);
                         pickedCar = carToPick.getCar();
-                        totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
 
+                        totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
+                        //pickedCar.setIsBoughtToTrue();
                     }
+                    else
+                    {
+                        pickedCar=null;
+                        carToPick.setIsCircleChoosen(false);
+                        System.out.println("Za malo punktow");
+                        JOptionPane.showMessageDialog(null,"Not enough points"); //narazie niech zostanie opcja z messageDialog
+                    }
+
                 }
             });
 
@@ -163,7 +180,7 @@ public class MainMenu
     private void addLevelButton(GameButton button)
     {
         button.setLayoutX(100+70);
-        button.setLayoutY(200+pickLevelButtons.size()*120);
+        button.setLayoutY(100+50+pickLevelButtons.size()*120);
         pickLevelButtons.add(button);
         levelPickerSubScene.getPane().getChildren().add(button);
     }
@@ -208,7 +225,20 @@ public class MainMenu
         GameButton level01Button = new GameButton("Level 1");
         addLevelButton(level01Button);
 
-        //tu bedzie actionListener otwierajacy pierwszy poziom
+        level01Button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(pickedCar!=null)
+                {
+                    GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                    gameViewManager.createNewGame(mainStage,pickedCar);
+                }
+                if(pickedCar==null)
+                {
+                    showSubscene(carPickerSubscene);
+                }
+            }
+        });
 
     }
     private void createLevel_02Button() throws FileNotFoundException
@@ -225,6 +255,20 @@ public class MainMenu
 
         //miejsce na actionListener
     }
+    private void createLevel_04Button() throws FileNotFoundException
+    {
+        GameButton level04Button = new GameButton("Level 4");
+        addLevelButton(level04Button);
+
+        //miejsce na actionListener
+    }
+    private void createLevel_05Button() throws FileNotFoundException
+    {
+        GameButton level05Button = new GameButton("Level 5");
+        addLevelButton(level05Button);
+
+        //miejsce na actionListener
+    }
     private void createButtons() throws FileNotFoundException {
         createStartButton();
         createCarPickerButton();
@@ -236,6 +280,8 @@ public class MainMenu
         createLevel_01Button();
         createLevel_02Button();
         createLevel_03Button();
+        createLevel_04Button();
+        createLevel_05Button();
     }
 
 
