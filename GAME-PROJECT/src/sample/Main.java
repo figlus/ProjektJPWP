@@ -10,7 +10,6 @@ import view.MainMenu;
 import java.util.HashMap;
 
 public class Main extends Application {
-    public ConfigFile configFile;
 
     @Override
     public void start(Stage primaryStage) throws Exception{

@@ -10,8 +10,6 @@ import java.util.List;
 
 public class ConfigFile {
     private final String fileName = getClass().getResource("/config.test").getFile();
-    private int coins;
-    private String userNick;
     private HashMap <String, Integer> players = new HashMap<String, Integer>();
 
 
@@ -34,11 +32,11 @@ public class ConfigFile {
             }
         }
 
-        userFind(usefulLines);
-        return players;
+        return userFind(usefulLines);
+
     }
 
-    private void userFind(List<String> usefulLines) {
+    private HashMap <String, Integer> userFind(List<String> usefulLines) {
         int genStartIndex = usefulLines.indexOf("[Users]") + 1;
         int genEndIndex = usefulLines.indexOf("[endUsers]");
         for (int i = genStartIndex; i < genEndIndex; i++) {
@@ -54,6 +52,7 @@ public class ConfigFile {
                 }
             }
         }
+        return players;
     }
 }
 

@@ -16,6 +16,7 @@ import sample.Main;
 
 import javax.swing.*;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,14 +155,13 @@ public class MainMenu
 
         Button loginButton = new Button("LOG IN");
 
-
-
             loginButton.setOnAction((event) -> {
                 String test = textFieldHashMap.get("userName").getText();
                 boolean been = false;
                 for (Map.Entry<String, Integer> entry : players.entrySet()) {
                     if (entry.getKey().equals(test)) {
                         been = true;
+                        totalCollectedPointsValue = entry.getValue();
                     }
             }
             if (been){JOptionPane.showMessageDialog(null, "Logged");}
@@ -301,7 +301,28 @@ public class MainMenu
         GameButton exitButton = new GameButton("EXIT");
         addMenuButton(exitButton);
 
-        exitButton.setOnAction(e -> mainStage.close());
+
+        exitButton.setOnAction((event) -> {
+            PrintWriter zapis = null;
+            try {
+                zapis = new PrintWriter("D:/Git/ProjektJPWP/GAME-PROJECT/src/config.test");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            zapis.println("[Users]");
+            for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                zapis.println("<"+entry.getKey()+">");
+                zapis.println(entry.getValue());
+                zapis.println("</"+entry.getKey()+">");
+                zapis.println("");
+                }
+
+            zapis.println("[endUsers]");
+            zapis.close();
+
+            mainStage.close();
+        });
+
 
     }
     private void createCarPickerButton() throws FileNotFoundException
