@@ -43,7 +43,7 @@ public class MainMenu
     private CAR pickedCar;
 
     private InfoLabel totalCollectedPointsLabel;
-    private int totalCollectedPointsValue;
+    public static int totalCollectedPointsValue;
 
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;

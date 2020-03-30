@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 
 import model.CAR;
+import model.InGameLabel;
 import model.InfoLabel;
 
 
@@ -64,6 +65,11 @@ public class GameViewManagerLevel_01 extends Thread
     private final static int VENDING_MACHINE_RADIUS_01 = 15;
     private final static int VENDING_MACHINE_RADIUS_02 = 30;
 
+    private final static int GOLD_STAR_RADIUS = 19;
+
+    private final static String GOLD_STAR_PATH = "view/resources/goldStar.png";
+    private InGameLabel pointsLabel;
+    private int inGamePoints;
     public GameViewManagerLevel_01()
     {
         initializeStage();
@@ -151,13 +157,40 @@ public class GameViewManagerLevel_01 extends Thread
 
     private void checkIfElementsCollide(CAR pickedCar)
     {
+
+        if(pickedCar.getRADIUS()+GOLD_STAR_RADIUS>calculateDistance(goldStar.getLayoutX()+24,car.getLayoutX()+pickedCar.getPlusX(),
+                goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY())
+        || pickedCar.getRADIUS2()+GOLD_STAR_RADIUS>calculateDistance(goldStar.getLayoutX()+24,car.getLayoutX()+pickedCar.getPlusX2(),
+                goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
+
+        {
+            setNewElementPosition(goldStar);
+            inGamePoints = inGamePoints + 10;
+            MainMenu.totalCollectedPointsValue += 10; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
+            String scoreToSet = "POINTS  :  ";
+            if(inGamePoints<10)
+            {
+                scoreToSet = scoreToSet + "0";
+            }
+            pointsLabel.setText(scoreToSet+inGamePoints);
+        }
+
+
+
+
         for(int i=0; i<smallObstacleRoadBlock.length; i++)
         {
             if(ROAD_BLOCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+10,car.getLayoutX()+pickedCar.getPlusX(),
                     smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY())
                                  || //jesli to wyzej lub to nizej jest spelnione to:
                     ROAD_BLOCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+40,car.getLayoutX()+pickedCar.getPlusX(),
-                    smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY()))
+                    smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY())||
+                    ROAD_BLOCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+10,car.getLayoutX()+pickedCar.getPlusX2(),
+                            smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2())
+                    || //jesli to wyzej lub to nizej jest spelnione to:
+                    ROAD_BLOCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+40,car.getLayoutX()+pickedCar.getPlusX2(),
+                            smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2()))
+
             {
                 removeLife();
                 setNewElementPosition(smallObstacleRoadBlock[i]);
@@ -167,7 +200,9 @@ public class GameViewManagerLevel_01 extends Thread
         for(int i=0; i<smallObstacleRock.length; i++)
         {
             if(ROCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX(),
-                    smallObstacleRock[i].getLayoutY()+20,car.getLayoutY()+pickedCar.getPlusY()))
+                    smallObstacleRock[i].getLayoutY()+20,car.getLayoutY()+pickedCar.getPlusY())||
+            ROCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX2(),
+                    smallObstacleRock[i].getLayoutY()+20,car.getLayoutY()+pickedCar.getPlusY2()))
             {
                 removeLife();
                 setNewElementPosition(smallObstacleRock[i]);
@@ -181,7 +216,13 @@ public class GameViewManagerLevel_01 extends Thread
             VENDING_MACHINE_RADIUS_01+pickedCar.getRADIUS()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+45,car.getLayoutX()+pickedCar.getPlusX(),
                     bigObstacleVendingMachine[i].getLayoutY()+75,car.getLayoutY()+pickedCar.getPlusY()) ||
             VENDING_MACHINE_RADIUS_02+pickedCar.getRADIUS()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,car.getLayoutX()+pickedCar.getPlusX(),
-                    bigObstacleVendingMachine[i].getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY()))
+                    bigObstacleVendingMachine[i].getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY())||
+                    VENDING_MACHINE_RADIUS_01+pickedCar.getRADIUS2()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+15,car.getLayoutX()+pickedCar.getPlusX2(),
+                            bigObstacleVendingMachine[i].getLayoutY()+75,car.getLayoutY()+pickedCar.getPlusY2()) ||
+                    VENDING_MACHINE_RADIUS_01+pickedCar.getRADIUS2()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+45,car.getLayoutX()+pickedCar.getPlusX2(),
+                            bigObstacleVendingMachine[i].getLayoutY()+75,car.getLayoutY()+pickedCar.getPlusY2()) ||
+                    VENDING_MACHINE_RADIUS_02+pickedCar.getRADIUS2()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,car.getLayoutX()+pickedCar.getPlusX2(),
+                            bigObstacleVendingMachine[i].getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
             {
                 removeLife();
                 setNewElementPosition(bigObstacleVendingMachine[i]);
@@ -208,6 +249,16 @@ public class GameViewManagerLevel_01 extends Thread
 
    private void createGameElements(CAR pickedCar)
    {
+
+
+       goldStar = new ImageView(GOLD_STAR_PATH);
+       setNewElementPosition(goldStar);
+       gamePane.getChildren().add(goldStar);
+
+       pointsLabel = new InGameLabel("  POINTS : 00");
+       pointsLabel.setLayoutX(600);
+       pointsLabel.setLayoutY(10);
+       gamePane.getChildren().add(pointsLabel);
 
 
 
@@ -241,14 +292,16 @@ public class GameViewManagerLevel_01 extends Thread
        for(int i=0; i<playerLifes.length; i++)
        {
            playerLifes[i] = new ImageView(pickedCar.getUrlLifeIndicator());
-           playerLifes[i].setLayoutX(600+(i*50));
-           playerLifes[i].setLayoutY(80);
+           playerLifes[i].setLayoutX(20+(i*50));
+           playerLifes[i].setLayoutY(20);
            gamePane.getChildren().add(playerLifes[i]);
        }
    }
 
    public void moveGameElements()
    {
+       goldStar.setLayoutY(goldStar.getLayoutY()+backgroundRollingSpeed);
+
        for(int i=0; i<smallObstacleRock.length; i++)
        {
            smallObstacleRock[i].setLayoutY(smallObstacleRock[i].getLayoutY()+backgroundRollingSpeed);
