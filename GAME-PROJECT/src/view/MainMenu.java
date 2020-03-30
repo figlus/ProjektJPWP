@@ -4,17 +4,22 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import model.*;
+import sample.Main;
 
 import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JFrame;
 
 public class MainMenu
@@ -32,6 +37,7 @@ public class MainMenu
     private MainMenuSubscenes sceneToHide;
     private MainMenuSubscenes carPickerSubscene;
 
+    MainMenuSubscenes loginSubscene;
     MainMenuSubscenes levelPickerSubScene;
     private List<GameButton> pickLevelButtons;
 
@@ -43,10 +49,11 @@ public class MainMenu
     private int totalCollectedPointsValue;
 
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private HashMap<String, Integer> players;
 
 
-    public MainMenu() throws FileNotFoundException
-    {
+    public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
+    {   this.players = players;
         mainPane = new AnchorPane();
         mainStage = new Stage();
         mainScene = new Scene(mainPane,1200,1000);
@@ -136,6 +143,83 @@ public class MainMenu
         levelPickerSubScene.getPane().getChildren().add(pickLevelLabel);
     }
 
+    private void createLoginSubScene()
+    {
+        loginSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(loginSubscene);
+
+        HashMap<String, TextField>  textFieldHashMap = new HashMap<>();
+        TextField userNameTextField = new TextField();
+        textFieldHashMap.put("userName", userNameTextField);
+
+        Button loginButton = new Button("LOG IN");
+
+
+
+            loginButton.setOnAction((event) -> {
+                String test = textFieldHashMap.get("userName").getText();
+                boolean been = false;
+                for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                    if (entry.getKey().equals(test)) {
+                        been = true;
+                    }
+            }
+            if (been){JOptionPane.showMessageDialog(null, "Logged");}
+            else{JOptionPane.showMessageDialog(null, "This user does not exist");}
+            });
+        userNameTextField.setLayoutX(100);
+        userNameTextField.setLayoutY(100);
+        userNameTextField.setPrefWidth(200);
+        userNameTextField.setPrefHeight(50);
+
+        loginButton.setLayoutX(300);
+        loginButton.setLayoutY(100);
+        loginButton.setPrefWidth(100);
+        loginButton.setPrefHeight(50);
+
+        loginSubscene.getPane().getChildren().addAll(userNameTextField, loginButton);
+
+
+        TextField newNameTextField = new TextField();
+        textFieldHashMap.put("newName", newNameTextField);
+
+        Button createButton = new Button("CREATE");
+        createButton.setOnAction((event) -> {
+            String test = textFieldHashMap.get("newName").getText();
+            boolean been = false;
+            for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                if (entry.getKey().equals(test)) {
+                    been = true;
+                }
+            }
+            if (been){JOptionPane.showMessageDialog(null, "This user already exists");}
+            else{players.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
+        });
+
+        newNameTextField.setLayoutX(100);
+        newNameTextField.setLayoutY(300);
+        newNameTextField.setPrefWidth(200);
+        newNameTextField.setPrefHeight(50);
+
+        createButton.setLayoutX(300);
+        createButton.setLayoutY(300);
+        createButton.setPrefWidth(100);
+        createButton.setPrefHeight(50);
+
+        loginSubscene.getPane().getChildren().addAll(newNameTextField, createButton);
+
+
+        InfoLabel loginLabel1 = new InfoLabel("LOG IN");
+        loginLabel1.setLayoutX(100);
+        loginLabel1.setLayoutY(20);
+        loginSubscene.getPane().getChildren().add(loginLabel1);
+        InfoLabel loginLabel2 = new InfoLabel("CREATE NEW USER");
+        loginLabel2.setLayoutX(100);
+        loginLabel2.setLayoutY(200);
+        loginSubscene.getPane().getChildren().add(loginLabel2);
+
+    }
+
     public Stage getMainStage()
     {
         return mainStage;
@@ -156,8 +240,9 @@ public class MainMenu
         mainPane.getChildren().add(helpSubscene);
 
         carPickerSubscene = new MainMenuSubscenes();
-                mainPane.getChildren().add(carPickerSubscene);
+        mainPane.getChildren().add(carPickerSubscene);
 
+        createLoginSubScene();
         createLevelPickerSubScene();
     }
     private void showSubscene(MainMenuSubscenes subScene)
@@ -203,6 +288,13 @@ public class MainMenu
         addMenuButton(creditsButton);
 
         creditsButton.setOnAction(e->showSubscene(creditsSubscene));
+
+    }
+    private void createLoginButton() throws FileNotFoundException {
+        GameButton loginButton = new GameButton("LOGIN");
+        addMenuButton(loginButton);
+
+        loginButton.setOnAction(e->showSubscene(loginSubscene));
 
     }
     private void createExitButton() throws FileNotFoundException {
@@ -270,11 +362,13 @@ public class MainMenu
         //miejsce na actionListener
     }
     private void createButtons() throws FileNotFoundException {
+        createLoginButton();
         createStartButton();
         createCarPickerButton();
         createHelpButton();
         createCreditsButton();
         createExitButton();
+
 
 
         createLevel_01Button();
