@@ -59,6 +59,11 @@ public class GameViewManagerLevel_01 extends Thread
     private final static String bigObstacleVendingMachine_PATH="view/resources/bigObstacles/bigObstacleVendingMachine.png";
     private Random randomPositionGenerator;
 
+    private final static int ROCK_RADIUS = 21;
+    private final static int ROAD_BLOCK_RADIUS = 10;
+    private final static int VENDING_MACHINE_RADIUS_01 = 15;
+    private final static int VENDING_MACHINE_RADIUS_02 = 30;
+
     public GameViewManagerLevel_01()
     {
         initializeStage();
@@ -73,18 +78,19 @@ public class GameViewManagerLevel_01 extends Thread
 
 
         createBackground();
-        createGameElements();
         createCar(pickedCar);
+        createGameElements(pickedCar);
 
 
 
 
 
-        createGameLoop();
+
+        createGameLoop(pickedCar);
         gameStage.show();
     }
 
-    public void createGameLoop()
+    public void createGameLoop(CAR pickedCar)
     {
         gameTimer = new AnimationTimer() {
             @Override
@@ -93,6 +99,7 @@ public class GameViewManagerLevel_01 extends Thread
                 moveBackground();
                 moveGameElements();
                 checkIfElementsAreBehindScreenAndRelocateThem();
+                checkIfElementsCollide(pickedCar);
                 moveCar();
             }
         };
@@ -137,8 +144,73 @@ public class GameViewManagerLevel_01 extends Thread
     }
 
 
-   public void createGameElements()
+    private double calculateDistance(double x1, double x2, double y1, double y2)
+    {
+        return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
+    }
+
+    private void checkIfElementsCollide(CAR pickedCar)
+    {
+        for(int i=0; i<smallObstacleRoadBlock.length; i++)
+        {
+            if(ROAD_BLOCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+10,car.getLayoutX()+pickedCar.getPlusX(),
+                    smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY())
+                                 || //jesli to wyzej lub to nizej jest spelnione to:
+                    ROAD_BLOCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+40,car.getLayoutX()+pickedCar.getPlusX(),
+                    smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY()))
+            {
+                removeLife();
+                setNewElementPosition(smallObstacleRoadBlock[i]);
+            }
+        }
+
+        for(int i=0; i<smallObstacleRock.length; i++)
+        {
+            if(ROCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX(),
+                    smallObstacleRock[i].getLayoutY()+20,car.getLayoutY()+pickedCar.getPlusY()))
+            {
+                removeLife();
+                setNewElementPosition(smallObstacleRock[i]);
+            }
+        }
+
+        for(int i=0; i<bigObstacleVendingMachine.length; i++)
+        {
+            if(VENDING_MACHINE_RADIUS_01+pickedCar.getRADIUS()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+15,car.getLayoutX()+pickedCar.getPlusX(),
+                    bigObstacleVendingMachine[i].getLayoutY()+75,car.getLayoutY()+pickedCar.getPlusY()) ||
+            VENDING_MACHINE_RADIUS_01+pickedCar.getRADIUS()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+45,car.getLayoutX()+pickedCar.getPlusX(),
+                    bigObstacleVendingMachine[i].getLayoutY()+75,car.getLayoutY()+pickedCar.getPlusY()) ||
+            VENDING_MACHINE_RADIUS_02+pickedCar.getRADIUS()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,car.getLayoutX()+pickedCar.getPlusX(),
+                    bigObstacleVendingMachine[i].getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY()))
+            {
+                removeLife();
+                setNewElementPosition(bigObstacleVendingMachine[i]);
+            }
+        }
+
+
+    }
+
+    private void removeLife()
+    {
+        gamePane.getChildren().remove(playerLifes[playerLife]);
+        playerLife--;
+
+        if(playerLife <0)
+        {
+            gameStage.close();
+            gameTimer.stop();
+            menuStage.show();
+            //tu jeszcze bedzie stop() zeby zakonczyc watek strzelania ! ! !
+        }
+
+    }
+
+   private void createGameElements(CAR pickedCar)
    {
+
+
+
         smallObstacleRock = new ImageView[3];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
@@ -162,6 +234,17 @@ public class GameViewManagerLevel_01 extends Thread
             setNewElementPosition(bigObstacleVendingMachine[i]);
             gamePane.getChildren().add(bigObstacleVendingMachine[i]);
         }
+
+       playerLife = pickedCar.getMaxHelath()-1;
+       playerLifes = new ImageView[pickedCar.getMaxHelath()];
+
+       for(int i=0; i<playerLifes.length; i++)
+       {
+           playerLifes[i] = new ImageView(pickedCar.getUrlLifeIndicator());
+           playerLifes[i].setLayoutX(600+(i*50));
+           playerLifes[i].setLayoutY(80);
+           gamePane.getChildren().add(playerLifes[i]);
+       }
    }
 
    public void moveGameElements()

@@ -1,5 +1,6 @@
 package view;
 
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -12,7 +13,9 @@ import javafx.stage.Stage;
 import model.*;
 
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -43,7 +46,7 @@ public class MainMenu
     private int totalCollectedPointsValue;
 
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
-
+    private AnimationTimer mainMenuTimer;
 
     public MainMenu() throws FileNotFoundException
     {
@@ -59,6 +62,7 @@ public class MainMenu
         createMainMenuSubscenes(); //has to be before createButtons() function
         createButtons();
         createTotalCollectedPointsLabel();
+        createMainMenuLoop();
 
 
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
@@ -68,6 +72,17 @@ public class MainMenu
 
 
 
+    }
+
+    private void createMainMenuLoop()
+    {
+        mainMenuTimer = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                totalCollectedPointsLabel.setText("Points: "+totalCollectedPointsValue);
+            }
+        };
+        mainMenuTimer.start();
     }
 
     private void createTotalCollectedPointsLabel()
