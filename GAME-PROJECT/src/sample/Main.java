@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import view.MainMenu;
 
+import java.util.HashMap;
+
 public class Main extends Application {
 
     @Override
@@ -15,8 +17,9 @@ public class Main extends Application {
         //primaryStage.setTitle("Hello World");
         //primaryStage.setScene(new Scene(root, 300, 275));
         //primaryStage.show();
-
-        MainMenu mainMenu = new MainMenu();
+        ConfigFile configFile = new ConfigFile();
+        HashMap<String, Integer> players = configFile.load();
+        MainMenu mainMenu = new MainMenu(players);
 
         primaryStage = mainMenu.getMainStage();
         primaryStage.show();
