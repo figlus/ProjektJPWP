@@ -48,6 +48,13 @@ public class MainMenu
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
+    public static boolean isLevelOneCopleted = false;
+    public static boolean isLevelTwoCompleted = false;
+    public static boolean isLevelThreeCompleted = false;
+    public static boolean isLeveLFourCompleted = false;
+    public static boolean isLevelFiveCompleted = false;
+
+
     public MainMenu() throws FileNotFoundException
     {
         mainPane = new AnchorPane();

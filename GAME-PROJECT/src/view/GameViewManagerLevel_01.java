@@ -17,6 +17,7 @@ import model.InGameLabel;
 import model.InfoLabel;
 
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class GameViewManagerLevel_01 extends Thread
     private GridPane gridPane1;
     private GridPane gridPane2;
 
-    private final int backgroundRollingSpeed = 3;
+    private  int backgroundRollingSpeed = 3;
     private int playerLife;
     private ImageView goldStar;
     private ImageView playerLifes[];
@@ -70,6 +71,11 @@ public class GameViewManagerLevel_01 extends Thread
     private final static String GOLD_STAR_PATH = "view/resources/goldStar.png";
     private InGameLabel pointsLabel;
     private int inGamePoints;
+
+    private int numberOfStarsRequiredtoCompliteMission = 5;
+    private int numberOfCollectedStars;
+
+
     public GameViewManagerLevel_01()
     {
         initializeStage();
@@ -107,6 +113,7 @@ public class GameViewManagerLevel_01 extends Thread
                 checkIfElementsAreBehindScreenAndRelocateThem();
                 checkIfElementsCollide(pickedCar);
                 moveCar();
+
             }
         };
 
@@ -166,6 +173,7 @@ public class GameViewManagerLevel_01 extends Thread
         {
             setNewElementPosition(goldStar);
             inGamePoints = inGamePoints + 10;
+            backgroundRollingSpeed+=1;
             MainMenu.totalCollectedPointsValue += 10; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
             String scoreToSet = "POINTS  :  ";
             if(inGamePoints<10)
@@ -173,6 +181,14 @@ public class GameViewManagerLevel_01 extends Thread
                 scoreToSet = scoreToSet + "0";
             }
             pointsLabel.setText(scoreToSet+inGamePoints);
+            numberOfCollectedStars+=1;
+
+            if(numberOfCollectedStars>=numberOfStarsRequiredtoCompliteMission)//which is 5 in this case
+            {
+                JOptionPane.showMessageDialog(null,"Mission Complete");
+                MainMenu.isLevelOneCopleted = true; //unlocking level two
+                endRound();
+            }
         }
 
 
@@ -239,11 +255,19 @@ public class GameViewManagerLevel_01 extends Thread
 
         if(playerLife <0)
         {
-            gameStage.close();
-            gameTimer.stop();
-            menuStage.show();
+            JOptionPane.showMessageDialog(null,"Mission Failed !");
+            endRound();
             //tu jeszcze bedzie stop() zeby zakonczyc watek strzelania ! ! !
         }
+
+    }
+
+    private void endRound()
+    {
+        gameStage.close();
+        gameTimer.stop();
+        menuStage.show();
+
 
     }
 
@@ -319,6 +343,11 @@ public class GameViewManagerLevel_01 extends Thread
 
    public void checkIfElementsAreBehindScreenAndRelocateThem()
    {
+       if(goldStar.getLayoutY()>1020)
+       {
+           setNewElementPosition(goldStar);
+       }
+
        for(int i=0; i<smallObstacleRock.length; i++)
        {
            if(smallObstacleRock[i].getLayoutY()>1010)
@@ -486,6 +515,13 @@ public class GameViewManagerLevel_01 extends Thread
         {
             gridPane2.setLayoutY(-1200);
         }
+        if(Math.abs(gridPane1.getLayoutY()-gridPane2.getLayoutY())!=1200)
+        {
+            gridPane1.setLayoutY(0);
+            gridPane2.setLayoutY(-1200);
+        }
     }
+
+
 
 }
