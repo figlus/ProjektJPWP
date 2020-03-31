@@ -393,6 +393,7 @@ public class GameViewManagerLevel_01 extends Thread
         gameStage.close();
         gameTimer.stop();
         menuStage.show();
+        stop();
 
 
     }
