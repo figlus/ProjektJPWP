@@ -37,6 +37,7 @@ public class GameViewManagerLevel_01 extends Thread
     private boolean isRightKeyPressed;
     private boolean isUpKeyPressed;
     private boolean isDownKeyPressed;
+    private boolean isFireKeyReleased;
 
     private  int carForwardSpeed = 4;
     private int carSideSpeed = 4;
@@ -75,6 +76,10 @@ public class GameViewManagerLevel_01 extends Thread
     private int numberOfStarsRequiredtoCompliteMission = 5;
     private int numberOfCollectedStars;
 
+    private ImageView bulletImage;
+    private final static String BULLET_PATH = "view/resources/bullet.png";
+    private List<ImageView> ammoBox = new ArrayList<>();
+    private int bulletSpeed = -5;
 
     public GameViewManagerLevel_01()
     {
@@ -94,9 +99,7 @@ public class GameViewManagerLevel_01 extends Thread
         createGameElements(pickedCar);
 
 
-
-
-
+        start();
 
         createGameLoop(pickedCar);
         gameStage.show();
@@ -112,12 +115,135 @@ public class GameViewManagerLevel_01 extends Thread
                 moveGameElements();
                 checkIfElementsAreBehindScreenAndRelocateThem();
                 checkIfElementsCollide(pickedCar);
+                checkIfBulletsAndElementsCollide();
                 moveCar();
+                fire(pickedCar);
 
             }
         };
 
         gameTimer.start();
+    }
+
+    public void run() {
+        while (true)
+        {
+            for (int i = 0; i < ammoBox.size(); i++) {
+                if (ammoBox.get(i).getLayoutY() > -50 && ammoBox.get(i) != null) {
+                    ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() + (bulletSpeed)); //bullet speed is declared above as -5
+                }
+                if (ammoBox.get(i).getLayoutY() <= -50) {
+                    ammoBox.set(i, null);
+                    ammoBox.remove(i);
+
+                }
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void fire(CAR pickedCar)
+    {
+        if(isFireKeyReleased==true)
+        {
+            if(ammoBox.size()<=4)
+            {
+                bulletImage = new ImageView(BULLET_PATH);
+                bulletImage.setLayoutY(car.getLayoutY()+pickedCar.getMuzzleY());
+                bulletImage.setLayoutX(car.getLayoutX()+pickedCar.getMuzzleX());
+                gamePane.getChildren().add(bulletImage);
+                ammoBox.add((bulletImage));
+                isFireKeyReleased = false;
+            }
+        }
+    }
+
+    private void checkIfBulletsAndElementsCollide()
+    {
+        for(int k=0; k<ammoBox.size(); k++)
+        {
+            if(GOLD_STAR_RADIUS>calculateDistance(goldStar.getLayoutX()+24,ammoBox.get(k).getLayoutX(),goldStar.getLayoutY()+30,ammoBox.get(k).getLayoutY()))
+            {
+                setNewElementPosition(goldStar);
+                ammoBox.get(k).setLayoutY(-60);
+            }
+        }
+
+
+        for(int i=0; i<smallObstacleRock.length; i++)
+        {
+            for(int k=0; k<ammoBox.size(); k++)
+            {
+                if(ROCK_RADIUS>calculateDistance(smallObstacleRock[i].getLayoutX()+25,ammoBox.get(k).getLayoutX(),
+                        smallObstacleRock[i].getLayoutY()+20,ammoBox.get(k).getLayoutY()))
+                {
+                    inGamePoints++;
+                    MainMenu.totalCollectedPointsValue ++;
+                    String textToSet = "POINTS  :";
+                    if(inGamePoints<10)
+                    {
+                        textToSet = textToSet + "  0";
+                    }
+                    pointsLabel.setText(textToSet + inGamePoints);
+
+                    setNewElementPosition(smallObstacleRock[i]);
+                    ammoBox.get(k).setLayoutY(-60);
+                }
+            }
+        }
+        for(int i=0; i<smallObstacleRoadBlock.length; i++)
+        {
+            for(int k=0; k<ammoBox.size(); k++)
+            {
+                if(     ROAD_BLOCK_RADIUS>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+10,ammoBox.get(k).getLayoutX(),
+                        smallObstacleRoadBlock[i].getLayoutY()+38,ammoBox.get(k).getLayoutY())||
+                        ROAD_BLOCK_RADIUS>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+40,ammoBox.get(k).getLayoutX(),
+                        smallObstacleRoadBlock[i].getLayoutY()+38,ammoBox.get(k).getLayoutY())||
+                        ROAD_BLOCK_RADIUS>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+25,ammoBox.get(k).getLayoutX(),
+                                smallObstacleRoadBlock[i].getLayoutY()+38,ammoBox.get(k).getLayoutY()))
+                {
+                    inGamePoints++;
+                    MainMenu.totalCollectedPointsValue ++;
+                    String textToSet = "POINTS  : ";
+                    if(inGamePoints<10)
+                    {
+                        textToSet = textToSet + " 0";
+                    }
+                    pointsLabel.setText(textToSet + inGamePoints);
+
+                    setNewElementPosition(smallObstacleRoadBlock[i]);
+                    ammoBox.get(k).setLayoutY(-60);
+                }
+            }
+        }
+        for(int i=0; i<bigObstacleVendingMachine.length; i++)
+        {
+            for(int k=0; k<ammoBox.size(); k++)
+            {
+                if(VENDING_MACHINE_RADIUS_02>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,ammoBox.get(k).getLayoutX(),
+                        bigObstacleVendingMachine[i].getLayoutY()+30,ammoBox.get(k).getLayoutY()))
+                {
+                    inGamePoints+=2;
+                    MainMenu.totalCollectedPointsValue +=2;
+                    String textToSet = "POINTS  : ";
+                    if(inGamePoints<10)
+                    {
+                        textToSet = textToSet + " 0";
+                    }
+                    pointsLabel.setText(textToSet + inGamePoints);
+
+                    setNewElementPosition(bigObstacleVendingMachine[i]);
+                    ammoBox.get(k).setLayoutY(-60);
+                }
+            }
+        }
+
+
     }
 
     private void initializeStage()
@@ -420,6 +546,11 @@ public class GameViewManagerLevel_01 extends Thread
                 {
                     isDownKeyPressed=false;
 
+                }
+
+                if(keyEvent.getCode()==KeyCode.F)
+                {
+                    isFireKeyReleased = true;
                 }
             }
         });
