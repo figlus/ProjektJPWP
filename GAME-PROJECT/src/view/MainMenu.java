@@ -55,9 +55,6 @@ public class MainMenu
     private InfoLabel totalCollectedPointsLabel;
     public static int totalCollectedPointsValue;
 
-    private InfoLabel userNickLabel;
-    public static String userNick = "Not logged in";
-
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
@@ -97,11 +94,6 @@ public class MainMenu
 
 
 
-
-    }
-    private void createMainMenuSounds()
-    {
-        //mainMenuButtonSound = new AudioClip(Paths.get("menuButtonClick.mp3").toUri().toString());
     }
 
     private void createMainMenuLoop()
@@ -335,6 +327,7 @@ public class MainMenu
         addMenuButton(startButton);
 
         startButton.setOnAction(e ->showSubscene(levelPickerSubScene));
+
 
     }
     private void createHelpButton() throws FileNotFoundException {
