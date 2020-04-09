@@ -371,7 +371,7 @@ public class MainMenu
     }
     private void createLevel_01Button() throws FileNotFoundException
     {
-        GameButton level01Button = new GameButton("Level 1");
+        GameButton level01Button = new GameButton("RAID");
         addLevelButton(level01Button);
 
         level01Button.setOnAction(new EventHandler<ActionEvent>() {

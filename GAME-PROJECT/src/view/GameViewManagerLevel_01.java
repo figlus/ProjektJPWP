@@ -86,7 +86,8 @@ public class GameViewManagerLevel_01 extends Thread
     private AudioClip gunFireSoundEffect;
     private AudioClip collisionSoundEffect;
 
-
+    private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
+    private ImageView fireImage;
 
 
 
@@ -127,6 +128,7 @@ public class GameViewManagerLevel_01 extends Thread
                 checkIfElementsCollide(pickedCar);
                 checkIfBulletsAndElementsCollide();
                 moveCar();
+                showMuzzleFlash(pickedCar);
                 fire(pickedCar);
 
             }
@@ -178,14 +180,34 @@ public class GameViewManagerLevel_01 extends Thread
 
                 gunFireSoundEffect.play();
 
+
                 bulletImage = new ImageView(BULLET_PATH);
                 bulletImage.setLayoutY(car.getLayoutY()+pickedCar.getMuzzleY());
                 bulletImage.setLayoutX(car.getLayoutX()+pickedCar.getMuzzleX());
                 gamePane.getChildren().add(bulletImage);
                 ammoBox.add((bulletImage));
                 isFireKeyReleased = false;
+
+
             }
 
+
+        }
+    }
+
+    private void showMuzzleFlash(CAR pickedCar)
+    {
+        if(isFireKeyReleased==true)
+        {
+            if(ammoBox.size()<=4) {
+                fireImage.setLayoutX(car.getLayoutX() + pickedCar.getMuzzleX() - 23);
+                fireImage.setLayoutY(car.getLayoutY() + pickedCar.getMuzzleY() - 24);
+            }
+        }
+
+        else
+        {
+            fireImage.setLayoutX(3000);
 
         }
     }
@@ -442,8 +464,14 @@ public class GameViewManagerLevel_01 extends Thread
        pointsLabel.setLayoutY(10);
        gamePane.getChildren().add(pointsLabel);
 
+       //creating fire image
+       fireImage = new ImageView(FIRE_IMAGE_PATH);
+       gamePane.getChildren().add(fireImage);
+       fireImage.setLayoutY(3000);
+       fireImage.setLayoutX(3000);
 
 
+       //creating road obstacles
         smallObstacleRock = new ImageView[3];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
