@@ -23,6 +23,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameViewManagerLevel_01 extends Thread
 {
@@ -50,14 +52,18 @@ public class GameViewManagerLevel_01 extends Thread
     private GridPane gridPane1;
     private GridPane gridPane2;
 
-    private  int backgroundRollingSpeed = 3;
+    private  double backgroundRollingSpeed = 3;
     private int playerLife;
     private ImageView goldStar;
     private ImageView playerLifes[];
     private ImageView smallObstacleRoadBlock[];
     private ImageView smallObstacleRock[];
-    private ImageView smallObstacleBranch[];
     private ImageView bigObstacleVendingMachine[];
+    private int smallObstacleRoadBlockHP[];
+    private int smallObstacleRockHP[];
+    private int bigObstacleVendingMachineHP[];
+    private final static int smallObstacleHealthPoints = 2;
+    private final static int bigObstacleHealthPoints = 3;
     private final static String smallObstacleRoadBlock_PATH = "view/resources/smallObstacles/smallObstacleRoadBlock.png";
     private final static String smallObstacleRock_PATH = "view/resources/smallObstacles/smallObstacleRock.png";
     private final static String smallObstacleBranch_PATH = "view/resources/smallObstacles/smallObstacleBranch.png";
@@ -65,7 +71,7 @@ public class GameViewManagerLevel_01 extends Thread
     private Random randomPositionGenerator;
 
     private final static int ROCK_RADIUS = 21;
-    private final static int ROAD_BLOCK_RADIUS = 10;
+    private final static int ROAD_BLOCK_RADIUS = 11;
     private final static int VENDING_MACHINE_RADIUS_01 = 15;
     private final static int VENDING_MACHINE_RADIUS_02 = 30;
 
@@ -75,8 +81,6 @@ public class GameViewManagerLevel_01 extends Thread
     private InGameLabel pointsLabel;
     private int inGamePoints;
 
-    private int numberOfStarsRequiredtoCompliteMission = 20;
-    private int numberOfCollectedStars;
 
     private ImageView bulletImage;
     private final static String BULLET_PATH = "view/resources/bullet.png";
@@ -90,6 +94,8 @@ public class GameViewManagerLevel_01 extends Thread
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
 
+    private java.util.Timer timer;
+    private TimerTask speedUp;
 
 
     public GameViewManagerLevel_01()
@@ -112,7 +118,7 @@ public class GameViewManagerLevel_01 extends Thread
 
 
         start();
-
+        speedUpTheGame();
         createGameLoop(pickedCar);
         gameStage.show();
     }
@@ -121,13 +127,13 @@ public class GameViewManagerLevel_01 extends Thread
     {
         gameTimer = new AnimationTimer() {
             @Override
-            public void handle(long currentNanoTime) {
+            public void handle(long now) {
 
                 moveBackground();
                 moveGameElements();
                 checkIfElementsAreBehindScreenAndRelocateThem();
                 checkIfElementsCollide(pickedCar);
-                checkIfBulletsAndElementsCollide();
+                checkIfBulletsAndElementsCollide(pickedCar);
                 moveCar();
                 showMuzzleFlash(pickedCar);
                 fire(pickedCar);
@@ -213,7 +219,7 @@ public class GameViewManagerLevel_01 extends Thread
         }
     }
 
-    private void checkIfBulletsAndElementsCollide()
+    private void checkIfBulletsAndElementsCollide(CAR pickedCar)
     {
         for(int k=0; k<ammoBox.size(); k++)
         {
@@ -232,18 +238,28 @@ public class GameViewManagerLevel_01 extends Thread
                 if(ROCK_RADIUS>calculateDistance(smallObstacleRock[i].getLayoutX()+25,ammoBox.get(k).getLayoutX(),
                         smallObstacleRock[i].getLayoutY()+20,ammoBox.get(k).getLayoutY()))
                 {
-                    inGamePoints++;
-                    MainMenu.totalCollectedPointsValue ++;
-                    String textToSet = "POINTS  :";
-                    if(inGamePoints<10)
-                    {
-                        textToSet = textToSet + "  0";
-                    }
-                    pointsLabel.setText(textToSet + inGamePoints);
 
-                    setNewElementPosition(smallObstacleRock[i]);
-                    ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                    if(smallObstacleRockHP[i]<=pickedCar.getGunDemage())
+                    {
+                        inGamePoints++;
+                        MainMenu.totalCollectedPointsValue++;
+                        String textToSet = "POINTS  :";
+                        if (inGamePoints < 10) {
+                            textToSet = textToSet + "  0";
+                        }
+                        pointsLabel.setText(textToSet + inGamePoints);
+
+                        setNewElementPosition(smallObstacleRock[i]);
+                        ammoBox.get(k).setLayoutY(-60);
+                        collisionSoundEffect.play();
+                        smallObstacleRockHP[i]=smallObstacleHealthPoints;
+                    }
+                    else
+                    {
+                        smallObstacleRockHP[i]-=pickedCar.getGunDemage();
+                        collisionSoundEffect.play();
+                        ammoBox.get(k).setLayoutY(-60);
+                    }
                 }
             }
         }
@@ -258,18 +274,27 @@ public class GameViewManagerLevel_01 extends Thread
                         ROAD_BLOCK_RADIUS>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+25,ammoBox.get(k).getLayoutX(),
                                 smallObstacleRoadBlock[i].getLayoutY()+38,ammoBox.get(k).getLayoutY()))
                 {
-                    inGamePoints++;
-                    MainMenu.totalCollectedPointsValue ++;
-                    String textToSet = "POINTS  : ";
-                    if(inGamePoints<10)
+                    if(smallObstacleRoadBlockHP[i]<=pickedCar.getGunDemage())
                     {
-                        textToSet = textToSet + " 0";
-                    }
-                    pointsLabel.setText(textToSet + inGamePoints);
+                        inGamePoints++;
+                        MainMenu.totalCollectedPointsValue++;
+                        String textToSet = "POINTS  : ";
+                        if (inGamePoints < 10) {
+                            textToSet = textToSet + " 0";
+                        }
+                        pointsLabel.setText(textToSet + inGamePoints);
 
-                    setNewElementPosition(smallObstacleRoadBlock[i]);
-                    ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                        setNewElementPosition(smallObstacleRoadBlock[i]);
+                        ammoBox.get(k).setLayoutY(-60);
+                        collisionSoundEffect.play();
+                        smallObstacleRoadBlockHP[i]=smallObstacleHealthPoints;
+                    }
+                    else
+                    {
+                        smallObstacleRoadBlockHP[i]-=pickedCar.getGunDemage();
+                        collisionSoundEffect.play();
+                        ammoBox.get(k).setLayoutY(-60);
+                    }
                 }
             }
         }
@@ -280,18 +305,25 @@ public class GameViewManagerLevel_01 extends Thread
                 if(VENDING_MACHINE_RADIUS_02>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,ammoBox.get(k).getLayoutX(),
                         bigObstacleVendingMachine[i].getLayoutY()+30,ammoBox.get(k).getLayoutY()))
                 {
-                    inGamePoints+=2;
-                    MainMenu.totalCollectedPointsValue +=2;
-                    String textToSet = "POINTS  : ";
-                    if(inGamePoints<10)
-                    {
-                        textToSet = textToSet + " 0";
-                    }
-                    pointsLabel.setText(textToSet + inGamePoints);
+                    if(bigObstacleVendingMachineHP[i]<=pickedCar.getGunDemage()) {
+                        inGamePoints += 2;
+                        MainMenu.totalCollectedPointsValue += 2;
+                        String textToSet = "POINTS  : ";
+                        if (inGamePoints < 10) {
+                            textToSet = textToSet + " 0";
+                        }
+                        pointsLabel.setText(textToSet + inGamePoints);
 
-                    setNewElementPosition(bigObstacleVendingMachine[i]);
-                    ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                        setNewElementPosition(bigObstacleVendingMachine[i]);
+                        ammoBox.get(k).setLayoutY(-60);
+                        collisionSoundEffect.play();
+                        bigObstacleVendingMachineHP[i]=bigObstacleHealthPoints;
+                    }
+                    else{
+                        collisionSoundEffect.play();
+                        bigObstacleVendingMachineHP[i]-=pickedCar.getGunDemage();
+                        ammoBox.get(k).setLayoutY(-60);
+                    }
                 }
             }
         }
@@ -335,6 +367,21 @@ public class GameViewManagerLevel_01 extends Thread
         gamePane.getChildren().add(gridPane2);
     }
 
+    private void speedUpTheGame()
+    {
+        timer = new Timer();
+        speedUp = new TimerTask() {
+            @Override
+            public void run() {
+                backgroundRollingSpeed+=0.5;
+                //bulletSpeed+=1;
+            }
+        };
+        timer.scheduleAtFixedRate(speedUp,10000l,10000l);
+
+
+    }
+
 
     private double calculateDistance(double x1, double x2, double y1, double y2)
     {
@@ -351,24 +398,19 @@ public class GameViewManagerLevel_01 extends Thread
 
         {
             setNewElementPosition(goldStar);
-            inGamePoints = inGamePoints + 10;
-            backgroundRollingSpeed+=1;
-            bulletSpeed+=1;
-            MainMenu.totalCollectedPointsValue += 10; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
+            inGamePoints = inGamePoints + 100;
+            //backgroundRollingSpeed+=1;
+            //bulletSpeed+=1;
+            MainMenu.totalCollectedPointsValue += 100; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
             String scoreToSet = "POINTS  :  ";
             if(inGamePoints<10)
             {
                 scoreToSet = scoreToSet + "0";
             }
             pointsLabel.setText(scoreToSet+inGamePoints);
-            numberOfCollectedStars+=1;
 
-            if(numberOfCollectedStars>=numberOfStarsRequiredtoCompliteMission)//which is 5 in this case
-            {
-                JOptionPane.showMessageDialog(null,"Mission Complete");
-                MainMenu.isLevelOneCopleted = true; //unlocking level two
-                endRound();
-            }
+
+
         }
 
 
@@ -385,6 +427,10 @@ public class GameViewManagerLevel_01 extends Thread
                             smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2())
                     || //jesli to wyzej lub to nizej jest spelnione to:
                     ROAD_BLOCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+40,car.getLayoutX()+pickedCar.getPlusX2(),
+                            smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2())||
+                    ROAD_BLOCK_RADIUS+pickedCar.getRADIUS()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX(),
+                            smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY())||
+                    ROAD_BLOCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRoadBlock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX2(),
                             smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2()))
 
             {
@@ -435,9 +481,9 @@ public class GameViewManagerLevel_01 extends Thread
 
         if(playerLife <0)
         {
-            JOptionPane.showMessageDialog(null,"Mission Failed !");
+            JOptionPane.showMessageDialog(null,"Game Over!");
             endRound();
-            //tu jeszcze bedzie stop() zeby zakonczyc watek strzelania ! ! !
+            stop();
         }
 
     }
@@ -473,13 +519,20 @@ public class GameViewManagerLevel_01 extends Thread
 
 
        //creating road obstacles
-        smallObstacleRock = new ImageView[3];
+        smallObstacleRock = new ImageView[5];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
             smallObstacleRock[i] = new ImageView(smallObstacleRock_PATH);
             setNewElementPosition(smallObstacleRock[i]);
             gamePane.getChildren().add(smallObstacleRock[i]);
         }
+        //creating HP array for Rocks
+        smallObstacleRockHP = new int[5];
+        for(int i=0; i<smallObstacleRockHP.length; i++)
+        {
+            smallObstacleRockHP[i]=smallObstacleHealthPoints;
+        }
+
 
         smallObstacleRoadBlock = new ImageView[3];
         for(int i=0; i<smallObstacleRoadBlock.length; i++)
@@ -488,6 +541,12 @@ public class GameViewManagerLevel_01 extends Thread
             setNewElementPosition(smallObstacleRoadBlock[i]);
             gamePane.getChildren().add(smallObstacleRoadBlock[i]);
         }
+        //creating HP array for road blocks
+        smallObstacleRoadBlockHP = new int[3];
+       for(int i=0; i<smallObstacleRoadBlockHP.length; i++)
+       {
+           smallObstacleRoadBlockHP[i]=smallObstacleHealthPoints;
+       }
 
         bigObstacleVendingMachine = new ImageView[3];
         for(int i=0; i<bigObstacleVendingMachine.length; i++)
@@ -496,6 +555,12 @@ public class GameViewManagerLevel_01 extends Thread
             setNewElementPosition(bigObstacleVendingMachine[i]);
             gamePane.getChildren().add(bigObstacleVendingMachine[i]);
         }
+        //creating HP array for vending machines
+        bigObstacleVendingMachineHP = new int[3];
+       for(int i=0; i<bigObstacleVendingMachineHP.length; i++)
+       {
+          bigObstacleVendingMachineHP[i]=bigObstacleHealthPoints;
+       }
 
        playerLife = pickedCar.getMaxHelath()-1;
        playerLifes = new ImageView[pickedCar.getMaxHelath()];
@@ -543,7 +608,7 @@ public class GameViewManagerLevel_01 extends Thread
            }
 
        }
-       for(int i=0; i<smallObstacleRock.length; i++)
+       for(int i=0; i<smallObstacleRoadBlock.length; i++)
        {
            if(smallObstacleRoadBlock[i].getLayoutY()>1010)
            {
@@ -621,7 +686,7 @@ public class GameViewManagerLevel_01 extends Thread
     private void setNewElementPosition(ImageView imageView) //ta funkcja wyrzuca elementy poza zasieg widzenia na drodze przejazdu samochodu ! !
     {
         imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
-        imageView.setLayoutY(-(randomPositionGenerator.nextInt(3000)+600));
+        imageView.setLayoutY(-(randomPositionGenerator.nextInt(5000)+600));
     }
 
 

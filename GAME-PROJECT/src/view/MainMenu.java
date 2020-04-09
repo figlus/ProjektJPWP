@@ -329,7 +329,8 @@ public class MainMenu
         GameButton startButton = new GameButton("PLAY");
         addMenuButton(startButton);
 
-        startButton.setOnAction(e -> {
+        startButton.setOnAction(e -> showSubscene(levelPickerSubScene));
+        /*startButton.setOnAction(e -> {
             if(beenLagged == true){
                 showSubscene(levelPickerSubScene);
             }
@@ -337,6 +338,8 @@ public class MainMenu
                 showSubscene(loginSubscene);
             }
         });
+
+         */
 
 
 
@@ -400,7 +403,8 @@ public class MainMenu
         GameButton carPickerButton = new GameButton("Cars");
         addMenuButton(carPickerButton);
 
-        carPickerButton.setOnAction(e -> {
+        carPickerButton.setOnAction(e-> showSubscene(carPickerSubscene));
+        /*carPickerButton.setOnAction(e -> {
             if(beenLagged == true){
                 showSubscene(carPickerSubscene);
             }
@@ -408,6 +412,8 @@ public class MainMenu
                 showSubscene(loginSubscene);
             }
         });
+
+         */
 
     }
     private void createLevel_01Button() throws FileNotFoundException
