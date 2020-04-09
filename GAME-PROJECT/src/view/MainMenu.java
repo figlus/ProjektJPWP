@@ -362,7 +362,7 @@ public class MainMenu
             //mainMenuButtonSound.play();
             PrintWriter zapis = null;
             try {
-                zapis = new PrintWriter("D:/Git/ProjektJPWP/GAME-PROJECT/src/config.test");
+                zapis = new PrintWriter("src/config.test");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
