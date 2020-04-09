@@ -71,6 +71,7 @@ public class MainMenu
     private HashMap<String, Integer> players;
 
     private AudioClip mainMenuButtonSound;
+    private boolean beenLagged = false;
 
     public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
     {   this.players = players;
@@ -193,17 +194,16 @@ public class MainMenu
 
             loginButton.setOnAction((event) -> {
                 String test = textFieldHashMap.get("userName").getText();
-                boolean been = false;
 
                 if (userNick.equals("Not logged in")){
                     for (Map.Entry<String, Integer> entry : players.entrySet()) {
                         if (entry.getKey().equals(test)) {
-                            been = true;
+                            beenLagged = true;
                             totalCollectedPointsValue = entry.getValue();
                             userNick=entry.getKey();
                         }
                     }
-                    if (been){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
                 else{
@@ -214,12 +214,12 @@ public class MainMenu
                     }
                     for (Map.Entry<String, Integer> entry : players.entrySet()) {
                         if (entry.getKey().equals(test)) {
-                            been = true;
+                            beenLagged = true;
                             totalCollectedPointsValue = entry.getValue();
                             userNick=entry.getKey();
                         }
                     }
-                    if (been){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
             });
@@ -329,7 +329,16 @@ public class MainMenu
         GameButton startButton = new GameButton("PLAY");
         addMenuButton(startButton);
 
-        startButton.setOnAction(e ->showSubscene(levelPickerSubScene));
+        startButton.setOnAction(e -> {
+            if(beenLagged == true){
+                showSubscene(levelPickerSubScene);
+            }
+            else{
+                showSubscene(loginSubscene);
+            }
+        });
+
+
 
 
     }
@@ -338,7 +347,7 @@ public class MainMenu
         addMenuButton(helpButton);
 
         helpButton.setOnAction(e->showSubscene(helpSubscene));
-        //helpButton.setOnAction(e->mainMenuButtonSound.play());
+
     }
     private void createCreditsButton() throws FileNotFoundException {
         GameButton creditsButton = new GameButton("CREDITS");
@@ -359,7 +368,12 @@ public class MainMenu
         GameButton exitButton = new GameButton("EXIT");
         addMenuButton(exitButton);
         exitButton.setOnAction((event) -> {
-            //mainMenuButtonSound.play();
+            for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                if (entry.getKey().equals(userNick)) {
+                    entry.setValue(totalCollectedPointsValue);
+                }
+            }
+
             PrintWriter zapis = null;
             try {
                 zapis = new PrintWriter("D:/Git/ProjektJPWP/GAME-PROJECT/src/config.test");
@@ -386,7 +400,14 @@ public class MainMenu
         GameButton carPickerButton = new GameButton("Cars");
         addMenuButton(carPickerButton);
 
-        carPickerButton.setOnAction(e->showSubscene(carPickerSubscene));
+        carPickerButton.setOnAction(e -> {
+            if(beenLagged == true){
+                showSubscene(carPickerSubscene);
+            }
+            else{
+                showSubscene(loginSubscene);
+            }
+        });
 
     }
     private void createLevel_01Button() throws FileNotFoundException
