@@ -3,12 +3,43 @@
 100
 </tata1>
 
+<[Users]>
+0
+</[Users]>
+
 <Aleksandra>
 15000
 </Aleksandra>
+
+<mama>
+0
+</mama>
+
+<tata>
+4917
+</tata>
+
+[endUsers]
+
+[Score]
+<tata1>
+100
+</tata1>
+
+<[Users]>
+0
+</[Users]>
+
+<Aleksandra>
+15000
+</Aleksandra>
+
+<mama>
+0
+</mama>
 
 <tata>
 4800
 </tata>
 
-[endUsers]
+[endScore]

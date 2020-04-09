@@ -13,18 +13,18 @@ import javafx.scene.text.Font;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class InfoLabel extends Label
+public class ScoreLabel extends Label
 {
     public final static String FONT_PATH = "view/resources/Oswald-Medium.ttf";
     public final static String LABEL_IMAGE_PATH = "view/resources/pickLevel.png";
 
-    public final static int prefLabelWidth = 300;
+    public final static int prefLabelWidth = 350;
     public final static int prefLabelHeight = 50;
 
     Image labelImage;
     BackgroundImage labelBackgroundImage;
 
-    public InfoLabel(String text)
+    public ScoreLabel(String text)
     {
         setPrefWidth(prefLabelWidth);
         setPrefHeight(prefLabelHeight);
@@ -58,6 +58,3 @@ public class InfoLabel extends Label
     }
 
 }
-
-
-

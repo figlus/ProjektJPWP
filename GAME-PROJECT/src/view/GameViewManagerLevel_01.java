@@ -140,8 +140,8 @@ public class GameViewManagerLevel_01 extends Thread
     private void createGameSoundEffects()
     {
 
-        gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
-        collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
+        //gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
+        //collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
 
 
     }
@@ -178,7 +178,7 @@ public class GameViewManagerLevel_01 extends Thread
             {
 
 
-                gunFireSoundEffect.play();
+                //gunFireSoundEffect.play();
 
 
                 bulletImage = new ImageView(BULLET_PATH);
@@ -242,7 +242,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRock[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                    //collisionSoundEffect.play();
                 }
             }
         }
@@ -268,7 +268,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRoadBlock[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                    //collisionSoundEffect.play();
                 }
             }
         }
@@ -290,7 +290,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(bigObstacleVendingMachine[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    collisionSoundEffect.play();
+                    //collisionSoundEffect.play();
                 }
             }
         }

@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import model.*;
 import sample.Main;
 
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -23,10 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.swing.JFrame;
 
 public class MainMenu
@@ -43,6 +41,7 @@ public class MainMenu
     private MainMenuSubscenes helpSubscene;
     private MainMenuSubscenes sceneToHide;
     private MainMenuSubscenes carPickerSubscene;
+    private MainMenuSubscenes scoreSubscene;
 
     MainMenuSubscenes loginSubscene;
     MainMenuSubscenes levelPickerSubScene;
@@ -69,12 +68,14 @@ public class MainMenu
 
 
     private HashMap<String, Integer> players;
+    private  HashMap<String, Integer> scoreSave;
 
     private AudioClip mainMenuButtonSound;
     private boolean beenLagged = false;
 
-    public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
+    public MainMenu(HashMap<String, Integer> players, HashMap<String, Integer> scoreSave) throws FileNotFoundException
     {   this.players = players;
+        this.scoreSave = scoreSave;
         mainPane = new AnchorPane();
         mainStage = new Stage();
         mainScene = new Scene(mainPane,1200,1000);
@@ -90,14 +91,7 @@ public class MainMenu
         //createMainMenuSounds();
         createMainMenuLoop();
 
-
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
-
-
-
-
-
-
     }
 
     private void createMainMenuLoop()
@@ -152,6 +146,7 @@ public class MainMenu
 
                         totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
                         //pickedCar.setIsBoughtToTrue();
+                        showSubscene(levelPickerSubScene);
                     }
                     else
                     {
@@ -203,7 +198,7 @@ public class MainMenu
                             userNick=entry.getKey();
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
                 else{
@@ -217,9 +212,10 @@ public class MainMenu
                             beenLagged = true;
                             totalCollectedPointsValue = entry.getValue();
                             userNick=entry.getKey();
+
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
             });
@@ -249,7 +245,7 @@ public class MainMenu
                 }
             }
             if (been){JOptionPane.showMessageDialog(null, "This user already exists");}
-            else{players.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
+            else{players.put(test,0); scoreSave.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
         });
 
         newNameTextField.setLayoutX(100);
@@ -276,6 +272,47 @@ public class MainMenu
 
     }
 
+    private void createScoreSubscene()
+    {
+       scoreSubscene = new MainMenuSubscenes();
+       mainPane.getChildren().add(scoreSubscene);
+
+        InfoLabel scoreTitle = new InfoLabel("TOP SCORE");
+        scoreTitle.setLayoutX(100);
+        scoreTitle.setLayoutY(20);
+        scoreSubscene.getPane().getChildren().add(scoreTitle);
+        int i =0;
+        int xPlayser = 75;
+        int yPlayser = 100;
+        Map<String, Integer> map = sortByValues(scoreSave);
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                ScoreLabel usersName = new ScoreLabel(i+1 +". "+ entry.getKey() + "     " + (entry.getValue()));
+                usersName.setLayoutX(xPlayser);
+                usersName.setLayoutY(yPlayser + 50*i);
+                scoreSubscene.getPane().getChildren().add(usersName);
+
+                i++;
+        }
+
+    }
+    private static HashMap sortByValues(HashMap map) {
+        List list = new LinkedList(map.entrySet());
+
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o2)).getValue())
+                        .compareTo(((Map.Entry) (o1)).getValue());
+            }
+        });
+
+        HashMap sortedHashMap = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
+    }
+
     public Stage getMainStage()
     {
         return mainStage;
@@ -300,6 +337,7 @@ public class MainMenu
 
         createLoginSubScene();
         createLevelPickerSubScene();
+        createScoreSubscene();
     }
     private void showSubscene(MainMenuSubscenes subScene)
     {
@@ -331,7 +369,7 @@ public class MainMenu
 
         startButton.setOnAction(e -> {
             if(beenLagged == true){
-                showSubscene(levelPickerSubScene);
+                showSubscene(carPickerSubscene);
             }
             else{
                 showSubscene(loginSubscene);
@@ -389,25 +427,28 @@ public class MainMenu
                 }
 
             zapis.println("[endUsers]");
+            zapis.println("");
+            zapis.println("[Score]");
+            for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
+                zapis.println("<"+entry.getKey()+">");
+                zapis.println(entry.getValue());
+                zapis.println("</"+entry.getKey()+">");
+                zapis.println("");
+            }
+
+            zapis.println("[endScore]");
             zapis.close();
 
             mainStage.close();
         });
 
     }
-    private void createCarPickerButton() throws FileNotFoundException
+    private void createScoreButton() throws FileNotFoundException
     {
-        GameButton carPickerButton = new GameButton("Cars");
-        addMenuButton(carPickerButton);
+        GameButton scoreButton = new GameButton("SCORE");
+        addMenuButton(scoreButton);
 
-        carPickerButton.setOnAction(e -> {
-            if(beenLagged == true){
-                showSubscene(carPickerSubscene);
-            }
-            else{
-                showSubscene(loginSubscene);
-            }
-        });
+        scoreButton.setOnAction(e ->  showSubscene(scoreSubscene));
 
     }
     private void createLevel_01Button() throws FileNotFoundException
@@ -462,7 +503,7 @@ public class MainMenu
     private void createButtons() throws FileNotFoundException {
         createLoginButton();
         createStartButton();
-        createCarPickerButton();
+        createScoreButton();
         createHelpButton();
         createCreditsButton();
         createExitButton();
