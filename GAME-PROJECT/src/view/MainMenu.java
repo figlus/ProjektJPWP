@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import model.*;
@@ -18,6 +19,8 @@ import sample.Main;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -67,7 +70,7 @@ public class MainMenu
 
     private HashMap<String, Integer> players;
 
-
+    private AudioClip mainMenuButtonSound;
 
     public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
     {   this.players = players;
@@ -83,6 +86,7 @@ public class MainMenu
         createMainMenuSubscenes(); //has to be before createButtons() function
         createButtons();
         createTotalCollectedPointsLabel();
+        createMainMenuSounds();
         createMainMenuLoop();
 
 
@@ -93,6 +97,11 @@ public class MainMenu
 
 
 
+
+    }
+    private void createMainMenuSounds()
+    {
+        //mainMenuButtonSound = new AudioClip(Paths.get("menuButtonClick.mp3").toUri().toString());
     }
 
     private void createMainMenuLoop()
@@ -333,27 +342,28 @@ public class MainMenu
         addMenuButton(helpButton);
 
         helpButton.setOnAction(e->showSubscene(helpSubscene));
-
+        //helpButton.setOnAction(e->mainMenuButtonSound.play());
     }
     private void createCreditsButton() throws FileNotFoundException {
         GameButton creditsButton = new GameButton("CREDITS");
         addMenuButton(creditsButton);
 
         creditsButton.setOnAction(e->showSubscene(creditsSubscene));
-
+        //creditsButton.setOnAction(e->mainMenuButtonSound.play());
     }
     private void createLoginButton() throws FileNotFoundException {
         GameButton loginButton = new GameButton("LOGIN");
         addMenuButton(loginButton);
 
         loginButton.setOnAction(e->showSubscene(loginSubscene));
-
+        //loginButton.setOnAction(e->mainMenuButtonSound.play());
     }
     private void createExitButton() throws FileNotFoundException {
 
         GameButton exitButton = new GameButton("EXIT");
         addMenuButton(exitButton);
         exitButton.setOnAction((event) -> {
+            //mainMenuButtonSound.play();
             PrintWriter zapis = null;
             try {
                 zapis = new PrintWriter("D:/Git/ProjektJPWP/GAME-PROJECT/src/config.test");
@@ -385,7 +395,7 @@ public class MainMenu
     }
     private void createLevel_01Button() throws FileNotFoundException
     {
-        GameButton level01Button = new GameButton("Level 1");
+        GameButton level01Button = new GameButton("RAID");
         addLevelButton(level01Button);
 
         level01Button.setOnAction(new EventHandler<ActionEvent>() {
