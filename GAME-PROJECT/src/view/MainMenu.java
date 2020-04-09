@@ -67,8 +67,8 @@ public class MainMenu
     public static boolean isLevelFiveCompleted = false;
 
 
-    private HashMap<String, Integer> players;
-    private  HashMap<String, Integer> scoreSave;
+    private static HashMap<String, Integer> players;
+    public static  HashMap<String, Integer> scoreSave;
 
     private AudioClip mainMenuButtonSound;
     private boolean beenLagged = false;
@@ -284,13 +284,13 @@ public class MainMenu
         int i =0;
         int xPlayser = 75;
         int yPlayser = 100;
-        Map<String, Integer> map = sortByValues(scoreSave);
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+        scoreSave = sortByValues(scoreSave);
+        for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
                 ScoreLabel usersName = new ScoreLabel(i+1 +". "+ entry.getKey() + "     " + (entry.getValue()));
                 usersName.setLayoutX(xPlayser);
-                usersName.setLayoutY(yPlayser + 50*i);
+                usersName.setLayoutY(yPlayser + 60*i );
                 scoreSubscene.getPane().getChildren().add(usersName);
-
+                if (i>9){break;}
                 i++;
         }
 
@@ -448,7 +448,11 @@ public class MainMenu
         GameButton scoreButton = new GameButton("SCORE");
         addMenuButton(scoreButton);
 
-        scoreButton.setOnAction(e ->  showSubscene(scoreSubscene));
+        scoreButton.setOnAction(e ->  {
+            scoreSubscene = null;
+            createScoreSubscene();
+            showSubscene(scoreSubscene);
+        });
 
     }
     private void createLevel_01Button() throws FileNotFoundException
