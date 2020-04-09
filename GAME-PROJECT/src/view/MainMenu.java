@@ -55,6 +55,9 @@ public class MainMenu
     private InfoLabel totalCollectedPointsLabel;
     public static int totalCollectedPointsValue;
 
+    public static String  userNick = "Not logged in";
+    public InfoLabel userNickLabel;
+
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
@@ -83,7 +86,7 @@ public class MainMenu
         createMainMenuSubscenes(); //has to be before createButtons() function
         createButtons();
         createTotalCollectedPointsLabel();
-        createMainMenuSounds();
+        //createMainMenuSounds();
         createMainMenuLoop();
 
 
