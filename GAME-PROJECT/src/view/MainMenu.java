@@ -52,6 +52,9 @@ public class MainMenu
     private InfoLabel totalCollectedPointsLabel;
     public static int totalCollectedPointsValue;
 
+    private InfoLabel userNickLabel;
+    public static String userNick = "Not logged in";
+
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
@@ -98,6 +101,7 @@ public class MainMenu
             @Override
             public void handle(long l) {
                 totalCollectedPointsLabel.setText("Points: "+totalCollectedPointsValue);
+                userNickLabel.setText("User: "+userNick);
             }
         };
         mainMenuTimer.start();
@@ -108,6 +112,9 @@ public class MainMenu
         totalCollectedPointsLabel = new InfoLabel("Total Points: "+ totalCollectedPointsValue);
         mainPane.getChildren().add(totalCollectedPointsLabel);
         totalCollectedPointsLabel.setLayoutY(950);
+        userNickLabel = new InfoLabel("User: "+ userNick);
+        mainPane.getChildren().add(userNickLabel);
+        userNickLabel.setLayoutY(900);
     }
 
     private VBox createCarPicker()
@@ -183,14 +190,34 @@ public class MainMenu
             loginButton.setOnAction((event) -> {
                 String test = textFieldHashMap.get("userName").getText();
                 boolean been = false;
-                for (Map.Entry<String, Integer> entry : players.entrySet()) {
-                    if (entry.getKey().equals(test)) {
-                        been = true;
-                        totalCollectedPointsValue = entry.getValue();
+
+                if (userNick.equals("Not logged in")){
+                    for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                        if (entry.getKey().equals(test)) {
+                            been = true;
+                            totalCollectedPointsValue = entry.getValue();
+                            userNick=entry.getKey();
+                        }
                     }
-            }
-            if (been){JOptionPane.showMessageDialog(null, "Logged");}
-            else{JOptionPane.showMessageDialog(null, "This user does not exist");}
+                    if (been){JOptionPane.showMessageDialog(null, "Logged");}
+                    else{JOptionPane.showMessageDialog(null, "This user does not exist");}
+                }
+                else{
+                    for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                        if (entry.getKey().equals(userNick)) {
+                            entry.setValue(totalCollectedPointsValue);
+                        }
+                    }
+                    for (Map.Entry<String, Integer> entry : players.entrySet()) {
+                        if (entry.getKey().equals(test)) {
+                            been = true;
+                            totalCollectedPointsValue = entry.getValue();
+                            userNick=entry.getKey();
+                        }
+                    }
+                    if (been){JOptionPane.showMessageDialog(null, "Logged");}
+                    else{JOptionPane.showMessageDialog(null, "This user does not exist");}
+                }
             });
         userNameTextField.setLayoutX(100);
         userNameTextField.setLayoutY(100);
@@ -323,10 +350,9 @@ public class MainMenu
 
     }
     private void createExitButton() throws FileNotFoundException {
+
         GameButton exitButton = new GameButton("EXIT");
         addMenuButton(exitButton);
-
-
         exitButton.setOnAction((event) -> {
             PrintWriter zapis = null;
             try {
@@ -347,7 +373,6 @@ public class MainMenu
 
             mainStage.close();
         });
-
 
     }
     private void createCarPickerButton() throws FileNotFoundException
