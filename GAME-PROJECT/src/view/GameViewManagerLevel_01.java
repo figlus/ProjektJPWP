@@ -2,22 +2,23 @@ package view;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 
 import model.CAR;
 import model.InGameLabel;
-import model.InfoLabel;
 
 
 import javax.swing.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -73,13 +74,22 @@ public class GameViewManagerLevel_01 extends Thread
     private InGameLabel pointsLabel;
     private int inGamePoints;
 
-    private int numberOfStarsRequiredtoCompliteMission = 5;
+    private int numberOfStarsRequiredtoCompliteMission = 20;
     private int numberOfCollectedStars;
 
     private ImageView bulletImage;
     private final static String BULLET_PATH = "view/resources/bullet.png";
     private List<ImageView> ammoBox = new ArrayList<>();
-    private int bulletSpeed = -5;
+    private int bulletSpeed = 5;
+
+
+    private AudioClip gunFireSoundEffect;
+    private AudioClip collisionSoundEffect;
+
+    private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
+    private ImageView fireImage;
+
+
 
     public GameViewManagerLevel_01()
     {
@@ -95,6 +105,7 @@ public class GameViewManagerLevel_01 extends Thread
 
 
         createBackground();
+        createGameSoundEffects();
         createCar(pickedCar);
         createGameElements(pickedCar);
 
@@ -109,7 +120,7 @@ public class GameViewManagerLevel_01 extends Thread
     {
         gameTimer = new AnimationTimer() {
             @Override
-            public void handle(long now) {
+            public void handle(long currentNanoTime) {
 
                 moveBackground();
                 moveGameElements();
@@ -117,6 +128,7 @@ public class GameViewManagerLevel_01 extends Thread
                 checkIfElementsCollide(pickedCar);
                 checkIfBulletsAndElementsCollide();
                 moveCar();
+                showMuzzleFlash(pickedCar);
                 fire(pickedCar);
 
             }
@@ -125,12 +137,21 @@ public class GameViewManagerLevel_01 extends Thread
         gameTimer.start();
     }
 
+    private void createGameSoundEffects()
+    {
+
+        gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
+        collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
+
+
+    }
+
     public void run() {
         while (true)
         {
             for (int i = 0; i < ammoBox.size(); i++) {
                 if (ammoBox.get(i).getLayoutY() > -50 && ammoBox.get(i) != null) {
-                    ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() + (bulletSpeed)); //bullet speed is declared above as -5
+                    ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
                 }
                 if (ammoBox.get(i).getLayoutY() <= -50) {
                     ammoBox.set(i, null);
@@ -144,6 +165,8 @@ public class GameViewManagerLevel_01 extends Thread
                 e.printStackTrace();
             }
 
+
+
         }
     }
 
@@ -153,13 +176,39 @@ public class GameViewManagerLevel_01 extends Thread
         {
             if(ammoBox.size()<=4)
             {
+
+
+                gunFireSoundEffect.play();
+
+
                 bulletImage = new ImageView(BULLET_PATH);
                 bulletImage.setLayoutY(car.getLayoutY()+pickedCar.getMuzzleY());
                 bulletImage.setLayoutX(car.getLayoutX()+pickedCar.getMuzzleX());
                 gamePane.getChildren().add(bulletImage);
                 ammoBox.add((bulletImage));
                 isFireKeyReleased = false;
+
+
             }
+
+
+        }
+    }
+
+    private void showMuzzleFlash(CAR pickedCar)
+    {
+        if(isFireKeyReleased==true)
+        {
+            if(ammoBox.size()<=4) {
+                fireImage.setLayoutX(car.getLayoutX() + pickedCar.getMuzzleX() - 23);
+                fireImage.setLayoutY(car.getLayoutY() + pickedCar.getMuzzleY() - 24);
+            }
+        }
+
+        else
+        {
+            fireImage.setLayoutX(3000);
+
         }
     }
 
@@ -193,6 +242,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRock[i]);
                     ammoBox.get(k).setLayoutY(-60);
+                    collisionSoundEffect.play();
                 }
             }
         }
@@ -218,6 +268,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRoadBlock[i]);
                     ammoBox.get(k).setLayoutY(-60);
+                    collisionSoundEffect.play();
                 }
             }
         }
@@ -239,6 +290,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(bigObstacleVendingMachine[i]);
                     ammoBox.get(k).setLayoutY(-60);
+                    collisionSoundEffect.play();
                 }
             }
         }
@@ -300,6 +352,7 @@ public class GameViewManagerLevel_01 extends Thread
             setNewElementPosition(goldStar);
             inGamePoints = inGamePoints + 10;
             backgroundRollingSpeed+=1;
+            bulletSpeed+=1;
             MainMenu.totalCollectedPointsValue += 10; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
             String scoreToSet = "POINTS  :  ";
             if(inGamePoints<10)
@@ -393,6 +446,7 @@ public class GameViewManagerLevel_01 extends Thread
         gameStage.close();
         gameTimer.stop();
         menuStage.show();
+        stop();
 
 
     }
@@ -410,8 +464,14 @@ public class GameViewManagerLevel_01 extends Thread
        pointsLabel.setLayoutY(10);
        gamePane.getChildren().add(pointsLabel);
 
+       //creating fire image
+       fireImage = new ImageView(FIRE_IMAGE_PATH);
+       gamePane.getChildren().add(fireImage);
+       fireImage.setLayoutY(3000);
+       fireImage.setLayoutX(3000);
 
 
+       //creating road obstacles
         smallObstacleRock = new ImageView[3];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
