@@ -2,6 +2,7 @@ package view;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -98,6 +99,13 @@ public class GameViewManagerLevel_01 extends Thread
     private TimerTask speedUp;
 
 
+    private final static String SMALL_IMPACT_EXPLOSION_PATH = "view/resources/smallExplosion.png";
+    private ImageView smallBulletImpactExplosion;
+
+    private MediaPlayer mediaPlayer;
+    private Media carSound;
+
+
     public GameViewManagerLevel_01()
     {
         initializeStage();
@@ -142,6 +150,7 @@ public class GameViewManagerLevel_01 extends Thread
         };
 
         gameTimer.start();
+
     }
 
     private void createGameSoundEffects()
@@ -149,6 +158,11 @@ public class GameViewManagerLevel_01 extends Thread
 
         gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
         collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
+
+        //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
+        //mediaPlayer = new MediaPlayer(carSound);
+        //mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        //mediaPlayer.play();
 
 
     }
@@ -259,6 +273,7 @@ public class GameViewManagerLevel_01 extends Thread
                         smallObstacleRockHP[i]-=pickedCar.getGunDemage();
                         collisionSoundEffect.play();
                         ammoBox.get(k).setLayoutY(-60);
+
                     }
                 }
             }
@@ -293,7 +308,9 @@ public class GameViewManagerLevel_01 extends Thread
                     {
                         smallObstacleRoadBlockHP[i]-=pickedCar.getGunDemage();
                         collisionSoundEffect.play();
+
                         ammoBox.get(k).setLayoutY(-60);
+
                     }
                 }
             }
@@ -383,6 +400,7 @@ public class GameViewManagerLevel_01 extends Thread
     }
 
 
+
     private double calculateDistance(double x1, double x2, double y1, double y2)
     {
         return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
@@ -434,6 +452,8 @@ public class GameViewManagerLevel_01 extends Thread
                             smallObstacleRoadBlock[i].getLayoutY()+38,car.getLayoutY()+pickedCar.getPlusY2()))
 
             {
+
+                collisionSoundEffect.play();
                 removeLife();
                 setNewElementPosition(smallObstacleRoadBlock[i]);
             }
@@ -446,6 +466,8 @@ public class GameViewManagerLevel_01 extends Thread
             ROCK_RADIUS+pickedCar.getRADIUS2()>calculateDistance(smallObstacleRock[i].getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX2(),
                     smallObstacleRock[i].getLayoutY()+20,car.getLayoutY()+pickedCar.getPlusY2()))
             {
+
+                collisionSoundEffect.play();
                 removeLife();
                 setNewElementPosition(smallObstacleRock[i]);
             }
@@ -466,6 +488,8 @@ public class GameViewManagerLevel_01 extends Thread
                     VENDING_MACHINE_RADIUS_02+pickedCar.getRADIUS2()>calculateDistance(bigObstacleVendingMachine[i].getLayoutX()+30,car.getLayoutX()+pickedCar.getPlusX2(),
                             bigObstacleVendingMachine[i].getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
             {
+
+                collisionSoundEffect.play();
                 removeLife();
                 setNewElementPosition(bigObstacleVendingMachine[i]);
             }
@@ -516,6 +540,12 @@ public class GameViewManagerLevel_01 extends Thread
        gamePane.getChildren().add(fireImage);
        fireImage.setLayoutY(3000);
        fireImage.setLayoutX(3000);
+
+       //creating small bullet impact explosion
+       smallBulletImpactExplosion = new ImageView(SMALL_IMPACT_EXPLOSION_PATH);
+       smallBulletImpactExplosion.setLayoutY(3000);
+       smallBulletImpactExplosion.setLayoutX(3000);
+       gamePane.getChildren().add(smallBulletImpactExplosion);
 
 
        //creating road obstacles
