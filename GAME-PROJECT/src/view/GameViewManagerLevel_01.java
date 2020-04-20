@@ -1,4 +1,5 @@
 package view;
+
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -8,14 +9,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-
-
 import model.CAR;
 import model.InGameLabel;
-
 
 import javax.swing.*;
 import java.nio.file.Paths;
@@ -84,8 +80,8 @@ public class GameViewManagerLevel_01 extends Thread
     private int bulletSpeed = 5;
 
 
-    private AudioClip gunFireSoundEffect;
-    private AudioClip collisionSoundEffect;
+    private AudioClip gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
+    private AudioClip collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
@@ -141,9 +137,6 @@ public class GameViewManagerLevel_01 extends Thread
     private void createGameSoundEffects()
     {
 
-        //gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
-        //collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
-
 
     }
 
@@ -179,7 +172,7 @@ public class GameViewManagerLevel_01 extends Thread
             {
 
 
-                //gunFireSoundEffect.play();
+                gunFireSoundEffect.play();
 
 
                 bulletImage = new ImageView(BULLET_PATH);
@@ -243,7 +236,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRock[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    //collisionSoundEffect.play();
+                    collisionSoundEffect.play();
                 }
             }
         }
@@ -269,7 +262,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(smallObstacleRoadBlock[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    //collisionSoundEffect.play();
+                    collisionSoundEffect.play();
                 }
             }
         }
@@ -291,7 +284,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                     setNewElementPosition(bigObstacleVendingMachine[i]);
                     ammoBox.get(k).setLayoutY(-60);
-                    //collisionSoundEffect.play();
+                    collisionSoundEffect.play();
                 }
             }
         }
