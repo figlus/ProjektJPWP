@@ -377,6 +377,7 @@ public class MainMenu
             }
             else {
                 showSubscene((loginSubscene));
+                buttonClickSound.play();
             }
         });
 
@@ -451,6 +452,7 @@ public class MainMenu
             zapis.close();
 
             mainStage.close();
+            System.exit(1);
         });
 
     }

@@ -79,7 +79,8 @@ public class GameViewManagerLevel_01 extends Thread
     private final static int VENDING_MACHINE_RADIUS_02 = 30;
 
     private final static int GOLD_STAR_RADIUS = 19;
-    private final static int GREEN_ARROW_RADIUS = 13;
+    private final static int GREEN_ARROW_RADIUS = 20;
+    private final static int BLUE_ARROW_RADIUS = 18;
     private final static String GOLD_STAR_PATH = "view/resources/goldStar.png";
     private InGameLabel pointsLabel;
     private int inGamePoints;
@@ -93,23 +94,28 @@ public class GameViewManagerLevel_01 extends Thread
 
     private AudioClip gunFireSoundEffect;
     private AudioClip collisionSoundEffect;
-    private AudioClip starCollestedSoiundEffect;
+    private AudioClip starCollestedSoundEffect;
+    private AudioClip greenArrowCollectedSoundEffect;
+    private AudioClip blueArrowCollectedSoundEffect;
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
 
     private java.util.Timer timer;
     private TimerTask speedUp;
+    private TimerTask hideMuzzleFlash;
 
+    private int muzzleX;
+    private int muzzleY;
 
-    private final static String SMALL_IMPACT_EXPLOSION_PATH = "view/resources/smallExplosion.png";
-    private ImageView smallBulletImpactExplosion;
-
-    private MediaPlayer mediaPlayer;
-    private Media carSound;
 
     private final static String greenArrow_PATH = "view/resources/greenArrow.png";
+    private final static String blueArrow_PATH = "view/resources/blueArrow.png";
+    private ImageView blueArrow;
     private ImageView greenArrow;
+
+
+
 
 
     public GameViewManagerLevel_01()
@@ -124,11 +130,14 @@ public class GameViewManagerLevel_01 extends Thread
         this.menuStage = menuStage;
         this.menuStage.hide();
 
-
+        muzzleX = pickedCar.getMuzzleX();
+        muzzleY = pickedCar.getMuzzleY();
         createBackground();
         createGameSoundEffects();
         createCar(pickedCar);
         createGameElements(pickedCar);
+        createAmmoBox();
+
 
 
         start();
@@ -149,8 +158,8 @@ public class GameViewManagerLevel_01 extends Thread
                 checkIfElementsCollide(pickedCar);
                 checkIfBulletsAndElementsCollide(pickedCar);
                 moveCar();
-                showMuzzleFlash(pickedCar);
-                fire(pickedCar);
+                //showMuzzleFlash(pickedCar);
+                //fire(pickedCar);
 
             }
         };
@@ -164,7 +173,9 @@ public class GameViewManagerLevel_01 extends Thread
 
         gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
         collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
-        starCollestedSoiundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
+        starCollestedSoundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
+        greenArrowCollectedSoundEffect = new AudioClip(Paths.get("arrowCollected.wav").toUri().toString());
+        blueArrowCollectedSoundEffect = new AudioClip(Paths.get("blueArrow.wav").toUri().toString());
         //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
         //mediaPlayer = new MediaPlayer(carSound);
         //mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -176,16 +187,49 @@ public class GameViewManagerLevel_01 extends Thread
     public void run() {
         while (true)
         {
-            for (int i = 0; i < ammoBox.size(); i++) {
-                if (ammoBox.get(i).getLayoutY() > -50 && ammoBox.get(i) != null) {
-                    ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
-                }
-                if (ammoBox.get(i).getLayoutY() <= -50) {
-                    ammoBox.set(i, null);
-                    ammoBox.remove(i);
+                /*try {
+                    for (int i = 0; i < ammoBox.size(); i++) {
+                        if (ammoBox.get(i).getLayoutY() > -50 && ammoBox.get(i) != null && ammoBox.size()!=0) {
+                            ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
+                        }
+                        if (ammoBox.get(i).getLayoutY() <= -50) {
+                            //ammoBox.set(i, null); //fnie wiadomo czy bez tego problem jest zlikwidowany :(
+                            ammoBox.remove(i);
 
+                        }
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }catch(Exception e)
+                {
+                    System.out.println("ERROR");
+                }*/
+
+                for(int i=0; i<ammoBox.size(); i++)
+                {
+                    if(isFireKeyReleased==true && ammoBox.get(i).getLayoutY()==1000 ) //wystrzal
+                    {
+                        ammoBox.get(i).setLayoutY(car.getLayoutY()+muzzleY);
+                        ammoBox.get(i).setLayoutX(car.getLayoutX()+muzzleX);
+
+                        gunFireSoundEffect.play();
+                        isFireKeyReleased=false;
+
+
+
+                    }
+                    if(ammoBox.get(i).getLayoutY()>-50 && ammoBox.get(i).getLayoutY()!=1000)
+                    {
+                        ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
+                    }
+                    if(ammoBox.get(i).getLayoutY()<=-50)
+                    {
+                        ammoBox.get(i).setLayoutY(1000);
+                    }
                 }
-            }
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -196,12 +240,25 @@ public class GameViewManagerLevel_01 extends Thread
 
         }
     }
+    private void createAmmoBox()
+    {
+        //tworze ammobox z 5 pociskami
+        ammoBox=new ArrayList<>();
 
-    private void fire(CAR pickedCar)
+        for(int i=0; i<5; i++)
+        {
+            bulletImage = new ImageView(BULLET_PATH);
+            bulletImage.setLayoutY(1000);
+            gamePane.getChildren().add(bulletImage);
+            ammoBox.add(bulletImage);
+        }
+    }
+
+    /*private void fire(CAR pickedCar)
     {
         if(isFireKeyReleased==true)
         {
-            if(ammoBox.size()<=4)
+            if(ammoBox.size()<=4) //default is 4
             {
 
 
@@ -214,15 +271,11 @@ public class GameViewManagerLevel_01 extends Thread
                 gamePane.getChildren().add(bulletImage);
                 ammoBox.add((bulletImage));
                 isFireKeyReleased = false;
-
-
             }
-
-
         }
-    }
+    }  */
 
-    private void showMuzzleFlash(CAR pickedCar)
+    /*private void showMuzzleFlash(CAR pickedCar)
     {
         if(isFireKeyReleased==true)
         {
@@ -237,7 +290,7 @@ public class GameViewManagerLevel_01 extends Thread
             fireImage.setLayoutX(3000);
 
         }
-    }
+    }*/
 
     private void checkIfBulletsAndElementsCollide(CAR pickedCar)
     {
@@ -415,26 +468,40 @@ public class GameViewManagerLevel_01 extends Thread
     private void checkIfElementsCollide(CAR pickedCar)
     {
 
-        if(pickedCar.getRADIUS()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+13,car.getLayoutX()+pickedCar.getPlusX(),
-                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY()) ||
-        pickedCar.getRADIUS()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+37,car.getLayoutX()+pickedCar.getPlusX(),
-                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY())||
-        pickedCar.getRADIUS2()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+13,car.getLayoutX()+pickedCar.getPlusX2(),
-                greenArrow.getLayoutY()+37,car.getLayoutX()+pickedCar.getPlusY2())||
-        pickedCar.getRADIUS2()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+37,car.getLayoutX()+pickedCar.getPlusX2(),
-                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY2()))
+        if(pickedCar.getRADIUS()+BLUE_ARROW_RADIUS>calculateDistance(blueArrow.getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX(),
+                blueArrow.getLayoutY()+26,car.getLayoutY()+pickedCar.getPlusY())||
+        pickedCar.getRADIUS2()+BLUE_ARROW_RADIUS>calculateDistance(blueArrow.getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX2(),
+                blueArrow.getLayoutY()+26,car.getLayoutY()+pickedCar.getPlusY2()))
         {
+            setReallyRareElementsPosition(blueArrow);
+            blueArrowCollectedSoundEffect.play();
+            System.out.println(backgroundRollingSpeed);
+            backgroundRollingSpeed-=0.5;
+            System.out.println(backgroundRollingSpeed);
+            inGamePoints+=10;
+
+
+        }
+
+        if(pickedCar.getRADIUS()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX(),
+                greenArrow.getLayoutY()+25,car.getLayoutY()+pickedCar.getPlusY()) ||
+        pickedCar.getRADIUS2()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+25,car.getLayoutX()+pickedCar.getPlusX2(),
+                greenArrow.getLayoutY()+25,car.getLayoutY()+pickedCar.getPlusY2()))
+        {
+            greenArrowCollectedSoundEffect.play();
             setRareElementPosition(greenArrow);
             carSideSpeed+=2;
+            carForwardSpeed+=1;
+            inGamePoints+=10;
             timer = new Timer();
-            TimerTask normalizeSideSpeed = new TimerTask() {
+            TimerTask normalizeCarSpeed = new TimerTask() {
                 @Override
                 public void run() {
                     carSideSpeed -=2;
-
+                    carForwardSpeed -=1;
                 }
             };
-            timer.schedule(normalizeSideSpeed,5000l);
+            timer.schedule(normalizeCarSpeed,6000l);//decreasing speed values to normal after 6 seconds
 
 
         }
@@ -445,7 +512,7 @@ public class GameViewManagerLevel_01 extends Thread
                 goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
 
         {
-            starCollestedSoiundEffect.play(200);
+            starCollestedSoundEffect.play(200);
             setNewElementPosition(goldStar);
             inGamePoints = inGamePoints + 100;
             //backgroundRollingSpeed+=1;
@@ -539,6 +606,7 @@ public class GameViewManagerLevel_01 extends Thread
             JOptionPane.showMessageDialog(null,"Game Over!");
             endRound();
 
+
         }
 
     }
@@ -554,13 +622,19 @@ public class GameViewManagerLevel_01 extends Thread
         gameStage.close();
         gameTimer.stop();
         menuStage.show();
-        stop();
+
+
 
 
     }
 
    private void createGameElements(CAR pickedCar)
    {
+       blueArrow = new ImageView(blueArrow_PATH);
+       setRareElementPosition(blueArrow);
+       setReallyRareElementsPosition(blueArrow);
+       gamePane.getChildren().add(blueArrow);
+
        greenArrow = new ImageView(greenArrow_PATH);
        setRareElementPosition(greenArrow);
        gamePane.getChildren().add(greenArrow);
@@ -647,6 +721,7 @@ public class GameViewManagerLevel_01 extends Thread
    {
        goldStar.setLayoutY(goldStar.getLayoutY()+backgroundRollingSpeed);
        greenArrow.setLayoutY(greenArrow.getLayoutY()+backgroundRollingSpeed);
+       blueArrow.setLayoutY(blueArrow.getLayoutY()+backgroundRollingSpeed);
 
        for(int i=0; i<smallObstacleRock.length; i++)
        {
@@ -665,6 +740,7 @@ public class GameViewManagerLevel_01 extends Thread
 
    public void checkIfElementsAreBehindScreenAndRelocateThem()
    {
+
        if(goldStar.getLayoutY()>1020)
        {
            setNewElementPosition(goldStar);
@@ -672,6 +748,10 @@ public class GameViewManagerLevel_01 extends Thread
        if(greenArrow.getLayoutY()>1200)
        {
            setRareElementPosition(greenArrow);
+       }
+       if(blueArrow.getLayoutY()>1200)
+       {
+           setReallyRareElementsPosition(blueArrow);
        }
 
        for(int i=0; i<smallObstacleRock.length; i++)
@@ -766,6 +846,11 @@ public class GameViewManagerLevel_01 extends Thread
     {
         imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
         imageView.setLayoutY(-(randomPositionGenerator.nextInt(1000)+3000));
+    }
+    private void setReallyRareElementsPosition(ImageView imageView)
+    {
+        imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
+        imageView.setLayoutY(-(randomPositionGenerator.nextInt(1000)+15000));
     }
 
 
