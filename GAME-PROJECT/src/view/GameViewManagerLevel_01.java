@@ -542,10 +542,10 @@ public class GameViewManagerLevel_01 extends Thread
        fireImage.setLayoutX(3000);
 
        //creating small bullet impact explosion
-       smallBulletImpactExplosion = new ImageView(SMALL_IMPACT_EXPLOSION_PATH);
-       smallBulletImpactExplosion.setLayoutY(3000);
-       smallBulletImpactExplosion.setLayoutX(3000);
-       gamePane.getChildren().add(smallBulletImpactExplosion);
+       //smallBulletImpactExplosion = new ImageView(SMALL_IMPACT_EXPLOSION_PATH);
+       //smallBulletImpactExplosion.setLayoutY(3000);
+       //smallBulletImpactExplosion.setLayoutX(3000);
+       //gamePane.getChildren().add(smallBulletImpactExplosion);
 
 
        //creating road obstacles
