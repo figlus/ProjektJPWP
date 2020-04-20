@@ -41,7 +41,6 @@ public class MainMenu
     private MainMenuSubscenes helpSubscene;
     private MainMenuSubscenes sceneToHide;
     private MainMenuSubscenes carPickerSubscene;
-    private MainMenuSubscenes scoreSubscene;
 
     MainMenuSubscenes loginSubscene;
     MainMenuSubscenes levelPickerSubScene;
@@ -70,7 +69,7 @@ public class MainMenu
     private static HashMap<String, Integer> players;
     public static  HashMap<String, Integer> scoreSave;
 
-    private AudioClip mainMenuButtonSound;
+    private AudioClip buttonClickSound;
     private boolean beenLagged = false;
 
     public MainMenu(HashMap<String, Integer> players, HashMap<String, Integer> scoreSave) throws FileNotFoundException
@@ -88,7 +87,7 @@ public class MainMenu
         createMainMenuSubscenes(); //has to be before createButtons() function
         createButtons();
         createTotalCollectedPointsLabel();
-        //createMainMenuSounds();
+        createMainMenuSounds();
         createMainMenuLoop();
 
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
@@ -163,6 +162,10 @@ public class MainMenu
         box.setLayoutX(20);
         box.setLayoutY(80);
         return box;
+    }
+    private void createMainMenuSounds()
+    {
+        buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
     }
 
     private void createLevelPickerSubScene()
@@ -368,6 +371,10 @@ public class MainMenu
         addMenuButton(startButton);
 
         startButton.setOnAction(e -> {
+            showSubscene(levelPickerSubScene);
+            buttonClickSound.play();
+        });
+        /*startButton.setOnAction(e -> {
             if(beenLagged == true){
                 showSubscene(carPickerSubscene);
             }
@@ -375,6 +382,8 @@ public class MainMenu
                 showSubscene(loginSubscene);
             }
         });
+
+         */
 
 
 
@@ -384,21 +393,30 @@ public class MainMenu
         GameButton helpButton = new GameButton("HELP");
         addMenuButton(helpButton);
 
-        helpButton.setOnAction(e->showSubscene(helpSubscene));
+        helpButton.setOnAction(e->{
+            showSubscene(helpSubscene);
+            buttonClickSound.play();
+        });
 
     }
     private void createCreditsButton() throws FileNotFoundException {
         GameButton creditsButton = new GameButton("CREDITS");
         addMenuButton(creditsButton);
 
-        creditsButton.setOnAction(e->showSubscene(creditsSubscene));
+        creditsButton.setOnAction(e->{
+            showSubscene(creditsSubscene);
+            buttonClickSound.play();
+        });
         //creditsButton.setOnAction(e->mainMenuButtonSound.play());
     }
     private void createLoginButton() throws FileNotFoundException {
         GameButton loginButton = new GameButton("LOGIN");
         addMenuButton(loginButton);
 
-        loginButton.setOnAction(e->showSubscene(loginSubscene));
+        loginButton.setOnAction(e->{
+            showSubscene(loginSubscene);
+            buttonClickSound.play();
+        });
         //loginButton.setOnAction(e->mainMenuButtonSound.play());
     }
     private void createExitButton() throws FileNotFoundException {
@@ -406,6 +424,7 @@ public class MainMenu
         GameButton exitButton = new GameButton("EXIT");
         addMenuButton(exitButton);
         exitButton.setOnAction((event) -> {
+            buttonClickSound.play();
             for (Map.Entry<String, Integer> entry : players.entrySet()) {
                 if (entry.getKey().equals(userNick)) {
                     entry.setValue(totalCollectedPointsValue);
@@ -414,7 +433,7 @@ public class MainMenu
 
             PrintWriter zapis = null;
             try {
-                zapis = new PrintWriter("D:/Git/ProjektJPWP/GAME-PROJECT/src/config.test");
+                zapis = new PrintWriter("src/config.test");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -448,11 +467,21 @@ public class MainMenu
         GameButton scoreButton = new GameButton("SCORE");
         addMenuButton(scoreButton);
 
-        scoreButton.setOnAction(e ->  {
-            scoreSubscene = null;
-            createScoreSubscene();
-            showSubscene(scoreSubscene);
+        carPickerButton.setOnAction(e->
+        {
+            showSubscene(carPickerSubscene);
+            buttonClickSound.play();
         });
+        /*carPickerButton.setOnAction(e -> {
+            if(beenLagged == true){
+                showSubscene(carPickerSubscene);
+            }
+            else{
+                showSubscene(loginSubscene);
+            }
+        });
+
+         */
 
     }
     private void createLevel_01Button() throws FileNotFoundException
