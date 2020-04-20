@@ -69,6 +69,7 @@ public class GameViewManagerLevel_01 extends Thread
     private final static String smallObstacleRock_PATH = "view/resources/smallObstacles/smallObstacleRock.png";
     private final static String smallObstacleBranch_PATH = "view/resources/smallObstacles/smallObstacleBranch.png";
     private final static String bigObstacleVendingMachine_PATH="view/resources/bigObstacles/bigObstacleVendingMachine.png";
+
     private Random randomPositionGenerator;
 
     private final static int ROCK_RADIUS = 21;
@@ -77,7 +78,7 @@ public class GameViewManagerLevel_01 extends Thread
     private final static int VENDING_MACHINE_RADIUS_02 = 30;
 
     private final static int GOLD_STAR_RADIUS = 19;
-
+    private final static int GREEN_ARROW_RADIUS = 13;
     private final static String GOLD_STAR_PATH = "view/resources/goldStar.png";
     private InGameLabel pointsLabel;
     private int inGamePoints;
@@ -91,6 +92,7 @@ public class GameViewManagerLevel_01 extends Thread
 
     private AudioClip gunFireSoundEffect;
     private AudioClip collisionSoundEffect;
+    private AudioClip starCollestedSoiundEffect;
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
@@ -104,6 +106,9 @@ public class GameViewManagerLevel_01 extends Thread
 
     private MediaPlayer mediaPlayer;
     private Media carSound;
+
+    private final static String greenArrow_PATH = "view/resources/greenArrow.png";
+    private ImageView greenArrow;
 
 
     public GameViewManagerLevel_01()
@@ -158,7 +163,7 @@ public class GameViewManagerLevel_01 extends Thread
 
         gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
         collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
-
+        starCollestedSoiundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
         //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
         //mediaPlayer = new MediaPlayer(carSound);
         //mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -395,8 +400,6 @@ public class GameViewManagerLevel_01 extends Thread
             }
         };
         timer.scheduleAtFixedRate(speedUp,10000l,10000l);
-
-
     }
 
 
@@ -409,12 +412,37 @@ public class GameViewManagerLevel_01 extends Thread
     private void checkIfElementsCollide(CAR pickedCar)
     {
 
+        if(pickedCar.getRADIUS()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+13,car.getLayoutX()+pickedCar.getPlusX(),
+                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY()) ||
+        pickedCar.getRADIUS()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+37,car.getLayoutX()+pickedCar.getPlusX(),
+                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY())||
+        pickedCar.getRADIUS2()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+13,car.getLayoutX()+pickedCar.getPlusX2(),
+                greenArrow.getLayoutY()+37,car.getLayoutX()+pickedCar.getPlusY2())||
+        pickedCar.getRADIUS2()+GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+37,car.getLayoutX()+pickedCar.getPlusX2(),
+                greenArrow.getLayoutY()+37,car.getLayoutY()+pickedCar.getPlusY2()))
+        {
+            setRareElementPosition(greenArrow);
+            carSideSpeed+=2;
+            timer = new Timer();
+            TimerTask normalizeSideSpeed = new TimerTask() {
+                @Override
+                public void run() {
+                    carSideSpeed -=2;
+
+                }
+            };
+            timer.schedule(normalizeSideSpeed,5000l);
+
+
+        }
+
         if(pickedCar.getRADIUS()+GOLD_STAR_RADIUS>calculateDistance(goldStar.getLayoutX()+24,car.getLayoutX()+pickedCar.getPlusX(),
                 goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY())
         || pickedCar.getRADIUS2()+GOLD_STAR_RADIUS>calculateDistance(goldStar.getLayoutX()+24,car.getLayoutX()+pickedCar.getPlusX2(),
                 goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
 
         {
+            starCollestedSoiundEffect.play(200);
             setNewElementPosition(goldStar);
             inGamePoints = inGamePoints + 100;
             //backgroundRollingSpeed+=1;
@@ -507,7 +535,7 @@ public class GameViewManagerLevel_01 extends Thread
         {
             JOptionPane.showMessageDialog(null,"Game Over!");
             endRound();
-            stop();
+
         }
 
     }
@@ -524,7 +552,9 @@ public class GameViewManagerLevel_01 extends Thread
 
    private void createGameElements(CAR pickedCar)
    {
-
+       greenArrow = new ImageView(greenArrow_PATH);
+       setRareElementPosition(greenArrow);
+       gamePane.getChildren().add(greenArrow);
 
        goldStar = new ImageView(GOLD_STAR_PATH);
        setNewElementPosition(goldStar);
@@ -607,6 +637,7 @@ public class GameViewManagerLevel_01 extends Thread
    public void moveGameElements()
    {
        goldStar.setLayoutY(goldStar.getLayoutY()+backgroundRollingSpeed);
+       greenArrow.setLayoutY(greenArrow.getLayoutY()+backgroundRollingSpeed);
 
        for(int i=0; i<smallObstacleRock.length; i++)
        {
@@ -628,6 +659,10 @@ public class GameViewManagerLevel_01 extends Thread
        if(goldStar.getLayoutY()>1020)
        {
            setNewElementPosition(goldStar);
+       }
+       if(greenArrow.getLayoutY()>1200)
+       {
+           setRareElementPosition(greenArrow);
        }
 
        for(int i=0; i<smallObstacleRock.length; i++)
@@ -716,7 +751,12 @@ public class GameViewManagerLevel_01 extends Thread
     private void setNewElementPosition(ImageView imageView) //ta funkcja wyrzuca elementy poza zasieg widzenia na drodze przejazdu samochodu ! !
     {
         imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
-        imageView.setLayoutY(-(randomPositionGenerator.nextInt(5000)+600));
+        imageView.setLayoutY(-(randomPositionGenerator.nextInt(5000)+1000));
+    }
+    private void setRareElementPosition(ImageView imageView)
+    {
+        imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
+        imageView.setLayoutY(-(randomPositionGenerator.nextInt(1000)+3000));
     }
 
 
