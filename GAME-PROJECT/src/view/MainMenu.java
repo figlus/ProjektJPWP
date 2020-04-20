@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import model.*;
 import sample.Main;
 
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -23,10 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.swing.JFrame;
 
 public class MainMenu
@@ -43,6 +41,7 @@ public class MainMenu
     private MainMenuSubscenes helpSubscene;
     private MainMenuSubscenes sceneToHide;
     private MainMenuSubscenes carPickerSubscene;
+    private MainMenuSubscenes scoreSubscene;
 
     MainMenuSubscenes loginSubscene;
     MainMenuSubscenes levelPickerSubScene;
@@ -68,13 +67,15 @@ public class MainMenu
     public static boolean isLevelFiveCompleted = false;
 
 
-    private HashMap<String, Integer> players;
+    private static HashMap<String, Integer> players;
+    public static  HashMap<String, Integer> scoreSave;
 
     private AudioClip buttonClickSound;
     private boolean beenLagged = false;
 
-    public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
+    public MainMenu(HashMap<String, Integer> players, HashMap<String, Integer> scoreSave) throws FileNotFoundException
     {   this.players = players;
+        this.scoreSave = scoreSave;
         mainPane = new AnchorPane();
         mainStage = new Stage();
         mainScene = new Scene(mainPane,1200,1000);
@@ -90,16 +91,23 @@ public class MainMenu
         createMainMenuSounds();
         createMainMenuLoop();
 
-
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
-
-
-
-
-
-
     }
 
+    public Stage getMainStage()
+    {
+        return mainStage;
+    }
+    public void createBackground()
+    {
+        Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
+        mainPane.setBackground(new Background(background));
+    }
+    private void createMainMenuSounds()
+    {
+        buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
+    }
     private void createMainMenuLoop()
     {
         mainMenuTimer = new AnimationTimer() {
@@ -150,14 +158,11 @@ public class MainMenu
                         carToPick.setIsCircleChoosen(true);
                         pickedCar = carToPick.getCar();
 
-                        totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
-                        //pickedCar.setIsBoughtToTrue();
                     }
                     else
                     {
                         pickedCar=null;
                         carToPick.setIsCircleChoosen(false);
-                        System.out.println("Za malo punktow");
                         JOptionPane.showMessageDialog(null,"Not enough points"); //narazie niech zostanie opcja z messageDialog
                     }
 
@@ -169,10 +174,7 @@ public class MainMenu
         box.setLayoutY(80);
         return box;
     }
-    private void createMainMenuSounds()
-    {
-        buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
-    }
+
 
     private void createLevelPickerSubScene()
     {
@@ -184,7 +186,6 @@ public class MainMenu
         pickLevelLabel.setLayoutY(20);
         levelPickerSubScene.getPane().getChildren().add(pickLevelLabel);
     }
-
     private void createLoginSubScene()
     {
         loginSubscene = new MainMenuSubscenes();
@@ -207,7 +208,7 @@ public class MainMenu
                             userNick=entry.getKey();
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
                 else{
@@ -221,9 +222,10 @@ public class MainMenu
                             beenLagged = true;
                             totalCollectedPointsValue = entry.getValue();
                             userNick=entry.getKey();
+
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
             });
@@ -253,7 +255,7 @@ public class MainMenu
                 }
             }
             if (been){JOptionPane.showMessageDialog(null, "This user already exists");}
-            else{players.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
+            else{players.put(test,0); scoreSave.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
         });
 
         newNameTextField.setLayoutX(100);
@@ -279,31 +281,28 @@ public class MainMenu
         loginSubscene.getPane().getChildren().add(loginLabel2);
 
     }
-
-    public Stage getMainStage()
+    private void createScoreSubscene()
     {
-        return mainStage;
-    }
-    public void createBackground()
-    {
-        Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
-        mainPane.setBackground(new Background(background));
-    }
+       scoreSubscene = new MainMenuSubscenes();
+       mainPane.getChildren().add(scoreSubscene);
 
-    private void createMainMenuSubscenes()
-    {
-        creditsSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(creditsSubscene);
+        InfoLabel scoreTitle = new InfoLabel("TOP SCORE");
+        scoreTitle.setLayoutX(100);
+        scoreTitle.setLayoutY(20);
+        scoreSubscene.getPane().getChildren().add(scoreTitle);
+        int i =0;
+        int xPlayser = 75;
+        int yPlayser = 100;
+        scoreSave = sortByValues(scoreSave);
+        for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
+                ScoreLabel usersName = new ScoreLabel(i+1 +". "+ entry.getKey() + "     " + (entry.getValue()));
+                usersName.setLayoutX(xPlayser);
+                usersName.setLayoutY(yPlayser + 60*i );
+                scoreSubscene.getPane().getChildren().add(usersName);
+                if (i>9){break;}
+                i++;
+        }
 
-        helpSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(helpSubscene);
-
-        carPickerSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(carPickerSubscene);
-
-        createLoginSubScene();
-        createLevelPickerSubScene();
     }
     private void showSubscene(MainMenuSubscenes subScene)
     {
@@ -313,6 +312,44 @@ public class MainMenu
         }
         subScene.moveMainMenuSubscene();
         sceneToHide=subScene;
+    }
+    private void createCarPickerSubscene(){
+        carPickerSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(carPickerSubscene);
+        Button playButton = new Button("PLAY");
+        playButton.setLayoutX(350);
+        playButton.setLayoutY(650);
+        playButton.setPrefWidth(100);
+        playButton.setPrefHeight(50);
+        playButton.setOnAction((event) -> {
+            totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
+            if(pickedCar!=null)
+            {
+                GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                gameViewManager.createNewGame(mainStage,pickedCar);
+            }
+            else{
+                JOptionPane.showMessageDialog(null,"Not choose car");
+            }
+
+        });
+        carPickerSubscene.getPane().getChildren().add(playButton);
+        }
+
+
+    private void createMainMenuSubscenes()
+    {
+        creditsSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(creditsSubscene);
+
+        helpSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(helpSubscene);
+
+
+        createCarPickerSubscene();
+        createLoginSubScene();
+        createLevelPickerSubScene();
+        createScoreSubscene();
     }
 
     private void addMenuButton(GameButton button)
@@ -334,22 +371,14 @@ public class MainMenu
         addMenuButton(startButton);
 
         startButton.setOnAction(e -> {
-            showSubscene(levelPickerSubScene);
-            buttonClickSound.play();
-        });
-        /*startButton.setOnAction(e -> {
-            if(beenLagged == true){
-                showSubscene(levelPickerSubScene);
+            if(userNick != "Not logged in") {
+                showSubscene(carPickerSubscene);
+                buttonClickSound.play();
             }
-            else{
-                showSubscene(loginSubscene);
+            else {
+                showSubscene((loginSubscene));
             }
         });
-
-         */
-
-
-
 
     }
     private void createHelpButton() throws FileNotFoundException {
@@ -409,32 +438,33 @@ public class MainMenu
                 }
 
             zapis.println("[endUsers]");
+            zapis.println("");
+            zapis.println("[Score]");
+            for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
+                zapis.println("<"+entry.getKey()+">");
+                zapis.println(entry.getValue());
+                zapis.println("</"+entry.getKey()+">");
+                zapis.println("");
+            }
+
+            zapis.println("[endScore]");
             zapis.close();
 
             mainStage.close();
         });
 
     }
-    private void createCarPickerButton() throws FileNotFoundException
+    private void createScoreButton() throws FileNotFoundException
     {
-        GameButton carPickerButton = new GameButton("Cars");
-        addMenuButton(carPickerButton);
+        GameButton scoreButton = new GameButton("SCORE");
+        addMenuButton(scoreButton);
 
-        carPickerButton.setOnAction(e->
-        {
-            showSubscene(carPickerSubscene);
+        scoreButton.setOnAction(e->
+        {   scoreSubscene = null;
+            createScoreSubscene();
+            showSubscene(scoreSubscene);
             buttonClickSound.play();
         });
-        /*carPickerButton.setOnAction(e -> {
-            if(beenLagged == true){
-                showSubscene(carPickerSubscene);
-            }
-            else{
-                showSubscene(loginSubscene);
-            }
-        });
-
-         */
 
     }
     private void createLevel_01Button() throws FileNotFoundException
@@ -489,7 +519,7 @@ public class MainMenu
     private void createButtons() throws FileNotFoundException {
         createLoginButton();
         createStartButton();
-        createCarPickerButton();
+        createScoreButton();
         createHelpButton();
         createCreditsButton();
         createExitButton();
@@ -503,5 +533,21 @@ public class MainMenu
         createLevel_05Button();
     }
 
+    private static HashMap sortByValues(HashMap map) {
+        List list = new LinkedList(map.entrySet());
 
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o2)).getValue())
+                        .compareTo(((Map.Entry) (o1)).getValue());
+            }
+        });
+
+        HashMap sortedHashMap = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
+    }
 }

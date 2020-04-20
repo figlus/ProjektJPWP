@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -400,6 +401,8 @@ public class GameViewManagerLevel_01 extends Thread
             }
         };
         timer.scheduleAtFixedRate(speedUp,10000l,10000l);
+
+
     }
 
 
@@ -542,6 +545,12 @@ public class GameViewManagerLevel_01 extends Thread
 
     private void endRound()
     {
+        for (Map.Entry<String, Integer> entry : MainMenu.scoreSave.entrySet()) {
+            if(entry.getKey().equals(MainMenu.userNick)){
+                if (entry.getValue() < inGamePoints)
+                    entry.setValue(inGamePoints);
+            }
+        }
         gameStage.close();
         gameTimer.stop();
         menuStage.show();

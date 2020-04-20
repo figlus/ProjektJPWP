@@ -1,14 +1,13 @@
 [Users]
-<tata1>
-100
-</tata1>
-
-<Aleksandra>
-15000
-</Aleksandra>
-
-<tata>
-2663
-</tata>
+<mama>
+220
+</mama>
 
 [endUsers]
+
+[Score]
+<mama>
+217
+</mama>
+
+[endScore]
