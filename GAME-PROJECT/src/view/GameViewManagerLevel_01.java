@@ -99,6 +99,9 @@ public class GameViewManagerLevel_01
     private AudioClip starCollestedSoundEffect;
     private AudioClip greenArrowCollectedSoundEffect;
     private AudioClip blueArrowCollectedSoundEffect;
+    private AudioClip bonusLostSoundEffect;
+    private AudioClip lowHPalarmSoundEffect;
+    private AudioClip gameOverSoundEffect;
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
@@ -227,6 +230,9 @@ public class GameViewManagerLevel_01
         starCollestedSoundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
         greenArrowCollectedSoundEffect = new AudioClip(Paths.get("arrowCollected.wav").toUri().toString());
         blueArrowCollectedSoundEffect = new AudioClip(Paths.get("blueArrow.wav").toUri().toString());
+        lowHPalarmSoundEffect = new AudioClip(Paths.get("lowHPalarm.wav").toUri().toString());
+        bonusLostSoundEffect = new AudioClip(Paths.get("bonusLost.wav").toUri().toString());
+        gameOverSoundEffect = new AudioClip(Paths.get("gameOver.mp3").toUri().toString());
 
         //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
         //mediaPlayer = new MediaPlayer(carSound);
@@ -280,7 +286,7 @@ public class GameViewManagerLevel_01
             {
                 setNewElementPosition(goldStar);
                 ammoBox.get(k).setLayoutY(-60);
-                collisionSoundEffect.play();
+                bonusLostSoundEffect.play();
             }
         }
 
@@ -290,7 +296,7 @@ public class GameViewManagerLevel_01
             {
                 setRareElementPosition(greenArrow);
                 ammoBox.get(k).setLayoutY(-60);
-                collisionSoundEffect.play();
+                bonusLostSoundEffect.play();
             }
         }
         for(int k=0; k<ammoBox.size();k++)
@@ -299,7 +305,7 @@ public class GameViewManagerLevel_01
             {
                 setReallyRareElementsPosition(blueArrow);
                 ammoBox.get(k).setLayoutY(-60);
-                collisionSoundEffect.play();
+                bonusLostSoundEffect.play();
             }
         }
 
@@ -614,10 +620,16 @@ public class GameViewManagerLevel_01
     {
         gamePane.getChildren().remove(playerLifes[playerLife]);
         playerLife--;
+        if(playerLife==0)
+        {
+            lowHPalarmSoundEffect.play();
+        }
 
         if(playerLife <0)
         {
+            gameOverSoundEffect.play(0.5);
             JOptionPane.showMessageDialog(null,"Game Over!");
+
             endRound();
 
 
