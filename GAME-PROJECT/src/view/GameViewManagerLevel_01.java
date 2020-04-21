@@ -30,7 +30,7 @@ import java.util.TimerTask;
 
 
 
-public class GameViewManagerLevel_01 extends Thread
+public class GameViewManagerLevel_01
 {
     private AnchorPane gamePane;
     private Scene gameScene;
@@ -91,7 +91,7 @@ public class GameViewManagerLevel_01 extends Thread
     private ImageView bulletImage;
     private final static String BULLET_PATH = "view/resources/bullet.png";
     private List<ImageView> ammoBox = new ArrayList<>();
-    private int bulletSpeed = 5;
+    private int bulletSpeed = 7;
 
 
     private AudioClip gunFireSoundEffect;
@@ -117,7 +117,8 @@ public class GameViewManagerLevel_01 extends Thread
     private ImageView greenArrow;
 
     private boolean stop = false;
-
+    private double distance = 0;
+    private AnimationTimer bulletsTimer;
 
 
     public GameViewManagerLevel_01()
@@ -142,10 +143,23 @@ public class GameViewManagerLevel_01 extends Thread
 
 
 
-        start();
+        //start();
         speedUpTheGame();
         createGameLoop(pickedCar);
+        createBulletLoop(pickedCar);
         gameStage.show();
+    }
+
+    private void createBulletLoop(CAR pickedCar)
+    {
+        bulletsTimer = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+
+                fireGun();
+            }
+        };
+        bulletsTimer.start();
     }
 
     public void createGameLoop(CAR pickedCar)
@@ -170,6 +184,37 @@ public class GameViewManagerLevel_01 extends Thread
         gameTimer.start();
 
     }
+    private void fireGun()
+    {
+        for(int i=0; i<ammoBox.size(); i++)
+        {
+
+            if(isFireKeyReleased==true && ammoBox.get(i).getLayoutY()==1000 ) //wystrzal
+            {
+                ammoBox.get(i).setLayoutY(car.getLayoutY()+muzzleY);
+                ammoBox.get(i).setLayoutX(car.getLayoutX()+muzzleX);
+
+                gunFireSoundEffect.play(0.5);
+                isFireKeyReleased=false;
+
+
+
+            }
+            if(ammoBox.get(i).getLayoutY()>-50 && ammoBox.get(i).getLayoutY()!=1000)
+            {
+                ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
+            }
+            if(ammoBox.get(i).getLayoutY()<=-50)
+            {
+                ammoBox.get(i).setLayoutY(1000);
+                ammoBox.get(i).setLayoutX(1000);
+
+            }
+        }
+
+
+
+    }
 
     private void createGameSoundEffects()
     {
@@ -179,6 +224,7 @@ public class GameViewManagerLevel_01 extends Thread
         starCollestedSoundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
         greenArrowCollectedSoundEffect = new AudioClip(Paths.get("arrowCollected.wav").toUri().toString());
         blueArrowCollectedSoundEffect = new AudioClip(Paths.get("blueArrow.wav").toUri().toString());
+
         //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
         //mediaPlayer = new MediaPlayer(carSound);
         //mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -187,65 +233,8 @@ public class GameViewManagerLevel_01 extends Thread
 
     }
 
-    public void run() {
-        while (stop==false) //thread ending condition
-        {
-                /*try {
-                    for (int i = 0; i < ammoBox.size(); i++) {
-                        if (ammoBox.get(i).getLayoutY() > -50 && ammoBox.get(i) != null && ammoBox.size()!=0) {
-                            ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
-                        }
-                        if (ammoBox.get(i).getLayoutY() <= -50) {
-                            //ammoBox.set(i, null); //fnie wiadomo czy bez tego problem jest zlikwidowany :(
-                            ammoBox.remove(i);
-
-                        }
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }catch(Exception e)
-                {
-                    System.out.println("ERROR");
-                }*/
-
-                for(int i=0; i<ammoBox.size(); i++)
-                {
-                   
-                    if(isFireKeyReleased==true && ammoBox.get(i).getLayoutY()==1000 ) //wystrzal
-                    {
-                        ammoBox.get(i).setLayoutY(car.getLayoutY()+muzzleY);
-                        ammoBox.get(i).setLayoutX(car.getLayoutX()+muzzleX);
-
-                        gunFireSoundEffect.play();
-                        isFireKeyReleased=false;
 
 
-
-                    }
-                    if(ammoBox.get(i).getLayoutY()>-50 && ammoBox.get(i).getLayoutY()!=1000)
-                    {
-                        ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
-                    }
-                    if(ammoBox.get(i).getLayoutY()<=-50)
-                    {
-                        ammoBox.get(i).setLayoutY(1000);
-                        ammoBox.get(i).setLayoutX(1000);
-
-                    }
-                }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-
-
-        }
-    }
     private void createAmmoBox()
     {
         //tworze ammobox z 5 pociskami
@@ -261,26 +250,7 @@ public class GameViewManagerLevel_01 extends Thread
         }
     }
 
-    /*private void fire(CAR pickedCar)
-    {
-        if(isFireKeyReleased==true)
-        {
-            if(ammoBox.size()<=4) //default is 4
-            {
 
-
-                gunFireSoundEffect.play();
-
-
-                bulletImage = new ImageView(BULLET_PATH);
-                bulletImage.setLayoutY(car.getLayoutY()+pickedCar.getMuzzleY());
-                bulletImage.setLayoutX(car.getLayoutX()+pickedCar.getMuzzleX());
-                gamePane.getChildren().add(bulletImage);
-                ammoBox.add((bulletImage));
-                isFireKeyReleased = false;
-            }
-        }
-    }  */
 
     /*private void showMuzzleFlash(CAR pickedCar)
     {
@@ -519,7 +489,7 @@ public class GameViewManagerLevel_01 extends Thread
                 goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
 
         {
-            starCollestedSoundEffect.play(200);
+            starCollestedSoundEffect.play(2);
             setNewElementPosition(goldStar);
             inGamePoints = inGamePoints + 100;
             //backgroundRollingSpeed+=1;
@@ -628,6 +598,7 @@ public class GameViewManagerLevel_01 extends Thread
         }
         gameStage.close();
         gameTimer.stop();
+        bulletsTimer.stop();
         menuStage.show();
         stop = true;// stop the bullets thread
 
@@ -671,7 +642,7 @@ public class GameViewManagerLevel_01 extends Thread
 
 
        //creating road obstacles
-        smallObstacleRock = new ImageView[5];
+        smallObstacleRock = new ImageView[7];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
             smallObstacleRock[i] = new ImageView(smallObstacleRock_PATH);
@@ -679,14 +650,14 @@ public class GameViewManagerLevel_01 extends Thread
             gamePane.getChildren().add(smallObstacleRock[i]);
         }
         //creating HP array for Rocks
-        smallObstacleRockHP = new int[5];
+        smallObstacleRockHP = new int[7];
         for(int i=0; i<smallObstacleRockHP.length; i++)
         {
             smallObstacleRockHP[i]=smallObstacleHealthPoints;
         }
 
 
-        smallObstacleRoadBlock = new ImageView[3];
+        smallObstacleRoadBlock = new ImageView[4];
         for(int i=0; i<smallObstacleRoadBlock.length; i++)
         {
             smallObstacleRoadBlock[i] = new ImageView(smallObstacleRoadBlock_PATH);
@@ -694,7 +665,7 @@ public class GameViewManagerLevel_01 extends Thread
             gamePane.getChildren().add(smallObstacleRoadBlock[i]);
         }
         //creating HP array for road blocks
-        smallObstacleRoadBlockHP = new int[3];
+        smallObstacleRoadBlockHP = new int[4];
        for(int i=0; i<smallObstacleRoadBlockHP.length; i++)
        {
            smallObstacleRoadBlockHP[i]=smallObstacleHealthPoints;
