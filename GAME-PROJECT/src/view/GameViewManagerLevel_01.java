@@ -66,8 +66,8 @@ public class GameViewManagerLevel_01
     private int smallObstacleRoadBlockHP[];
     private int smallObstacleRockHP[];
     private int bigObstacleVendingMachineHP[];
-    private final static int smallObstacleHealthPoints = 2;
-    private final static int bigObstacleHealthPoints = 3;
+    private final static int smallObstacleHealthPoints = 3;
+    private final static int bigObstacleHealthPoints = 5;
     private final static String smallObstacleRoadBlock_PATH = "view/resources/smallObstacles/smallObstacleRoadBlock.png";
     private final static String smallObstacleRock_PATH = "view/resources/smallObstacles/smallObstacleRock.png";
     private final static String smallObstacleBranch_PATH = "view/resources/smallObstacles/smallObstacleBranch.png";
@@ -116,8 +116,8 @@ public class GameViewManagerLevel_01
     private ImageView blueArrow;
     private ImageView greenArrow;
 
-    private boolean stop = false;
-    private double distance = 0;
+
+    private int bulletsFly= 0;
     private AnimationTimer bulletsTimer;
 
 
@@ -174,7 +174,7 @@ public class GameViewManagerLevel_01
                 checkIfElementsCollide(pickedCar);
                 checkIfBulletsAndElementsCollide(pickedCar);
                 moveCar();
-                //showMuzzleFlash(pickedCar);
+                showMuzzleFlash(pickedCar);
                 //fire(pickedCar);
 
 
@@ -193,13 +193,15 @@ public class GameViewManagerLevel_01
             {
                 ammoBox.get(i).setLayoutY(car.getLayoutY()+muzzleY);
                 ammoBox.get(i).setLayoutX(car.getLayoutX()+muzzleX);
+                bulletsFly+=1;
+                //fireImage.setLayoutX(car.getLayoutX()+muzzleX-23);
+                //fireImage.setLayoutY(car.getLayoutY()+muzzleY-24);
 
                 gunFireSoundEffect.play(0.5);
                 isFireKeyReleased=false;
 
-
-
             }
+
             if(ammoBox.get(i).getLayoutY()>-50 && ammoBox.get(i).getLayoutY()!=1000)
             {
                 ammoBox.get(i).setLayoutY(ammoBox.get(i).getLayoutY() - (bulletSpeed)); //bullet speed is declared above as -5
@@ -208,6 +210,7 @@ public class GameViewManagerLevel_01
             {
                 ammoBox.get(i).setLayoutY(1000);
                 ammoBox.get(i).setLayoutX(1000);
+                bulletsFly-=1;
 
             }
         }
@@ -252,11 +255,11 @@ public class GameViewManagerLevel_01
 
 
 
-    /*private void showMuzzleFlash(CAR pickedCar)
+   private void showMuzzleFlash(CAR pickedCar)
     {
         if(isFireKeyReleased==true)
         {
-            if(ammoBox.size()<=4) {
+            if(bulletsFly!=5) {
                 fireImage.setLayoutX(car.getLayoutX() + pickedCar.getMuzzleX() - 23);
                 fireImage.setLayoutY(car.getLayoutY() + pickedCar.getMuzzleY() - 24);
             }
@@ -267,7 +270,7 @@ public class GameViewManagerLevel_01
             fireImage.setLayoutX(3000);
 
         }
-    }*/
+    }
 
     private void checkIfBulletsAndElementsCollide(CAR pickedCar)
     {
@@ -277,6 +280,26 @@ public class GameViewManagerLevel_01
             {
                 setNewElementPosition(goldStar);
                 ammoBox.get(k).setLayoutY(-60);
+                collisionSoundEffect.play();
+            }
+        }
+
+        for(int k=0; k<ammoBox.size(); k++)
+        {
+            if(GREEN_ARROW_RADIUS>calculateDistance(greenArrow.getLayoutX()+25,ammoBox.get(k).getLayoutX(),greenArrow.getLayoutY()+25,ammoBox.get(k).getLayoutY()))
+            {
+                setRareElementPosition(greenArrow);
+                ammoBox.get(k).setLayoutY(-60);
+                collisionSoundEffect.play();
+            }
+        }
+        for(int k=0; k<ammoBox.size();k++)
+        {
+            if(BLUE_ARROW_RADIUS>calculateDistance(blueArrow.getLayoutX()+25,ammoBox.get(k).getLayoutX(),blueArrow.getLayoutY()+26,ammoBox.get(k).getLayoutY()))
+            {
+                setReallyRareElementsPosition(blueArrow);
+                ammoBox.get(k).setLayoutY(-60);
+                collisionSoundEffect.play();
             }
         }
 
@@ -359,8 +382,8 @@ public class GameViewManagerLevel_01
                         bigObstacleVendingMachine[i].getLayoutY()+30,ammoBox.get(k).getLayoutY()))
                 {
                     if(bigObstacleVendingMachineHP[i]<=pickedCar.getGunDemage()) {
-                        inGamePoints += 2;
-                        MainMenu.totalCollectedPointsValue += 2;
+                        inGamePoints += 5;
+                        MainMenu.totalCollectedPointsValue += 5;
                         String textToSet = "POINTS  : ";
                         if (inGamePoints < 10) {
                             textToSet = textToSet + " 0";
@@ -430,7 +453,7 @@ public class GameViewManagerLevel_01
                 //bulletSpeed+=1;
             }
         };
-        timer.scheduleAtFixedRate(speedUp,10000l,10000l);
+        timer.scheduleAtFixedRate(speedUp,5000l,5000l);
 
 
     }
@@ -455,7 +478,16 @@ public class GameViewManagerLevel_01
             System.out.println(backgroundRollingSpeed);
             backgroundRollingSpeed-=0.5;
             System.out.println(backgroundRollingSpeed);
-            inGamePoints+=10;
+
+            //increasing points for collecting item
+            MainMenu.totalCollectedPointsValue += 30; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
+            inGamePoints = inGamePoints + 30;
+            String scoreToSet = "POINTS  :  ";
+            if(inGamePoints<10)
+            {
+                scoreToSet = scoreToSet + "0";
+            }
+            pointsLabel.setText(scoreToSet+inGamePoints);
 
 
         }
@@ -469,7 +501,6 @@ public class GameViewManagerLevel_01
             setRareElementPosition(greenArrow);
             carSideSpeed+=2;
             carForwardSpeed+=1;
-            inGamePoints+=10;
             timer = new Timer();
             TimerTask normalizeCarSpeed = new TimerTask() {
                 @Override
@@ -480,6 +511,15 @@ public class GameViewManagerLevel_01
             };
             timer.schedule(normalizeCarSpeed,6000l);//decreasing speed values to normal after 6 seconds
 
+            //increasing points for collecting item
+            MainMenu.totalCollectedPointsValue += 20; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
+            inGamePoints = inGamePoints + 20;
+            String scoreToSet = "POINTS  :  ";
+            if(inGamePoints<10)
+            {
+                scoreToSet = scoreToSet + "0";
+            }
+            pointsLabel.setText(scoreToSet+inGamePoints);
 
         }
 
@@ -489,21 +529,18 @@ public class GameViewManagerLevel_01
                 goldStar.getLayoutY()+30,car.getLayoutY()+pickedCar.getPlusY2()))
 
         {
-            starCollestedSoundEffect.play(2);
+            starCollestedSoundEffect.play(1);
             setNewElementPosition(goldStar);
-            inGamePoints = inGamePoints + 100;
-            //backgroundRollingSpeed+=1;
-            //bulletSpeed+=1;
+
+            //increasing points for collecting item
             MainMenu.totalCollectedPointsValue += 100; //zwiekszamy liczbe punktow w MainMenu o wartosc gwiazdy czyli 10 :)
+            inGamePoints = inGamePoints + 100;
             String scoreToSet = "POINTS  :  ";
             if(inGamePoints<10)
             {
                 scoreToSet = scoreToSet + "0";
             }
             pointsLabel.setText(scoreToSet+inGamePoints);
-
-
-
         }
 
 
@@ -600,7 +637,7 @@ public class GameViewManagerLevel_01
         gameTimer.stop();
         bulletsTimer.stop();
         menuStage.show();
-        stop = true;// stop the bullets thread
+
 
 
 

@@ -8,8 +8,8 @@ public enum CAR
             23,25,35,23,25,94,25,-10),
     CAR_LEVEL_03("view/resources/cars/blueCar.png","view/resources/lifeIndicator.png",3,5,3000,false,false,
             23,25,25,23,25,92,23,4),
-    MOTORBOAT_01("view/resources/cars/motorBoat.png","view/resources/lifeIndicator.png",5,2,5000,false,true,
-            22,24,33,23,24,77,24,38);
+    CAR_LEVEL_04("view/resources/cars/greyCar.png","view/resources/lifeIndicator.png",7,1,5000,false,true,
+            22,24,33,23,24,77,23,0);
 
 
     String urlLifeIndicator;
