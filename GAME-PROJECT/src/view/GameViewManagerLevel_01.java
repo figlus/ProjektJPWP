@@ -28,6 +28,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+
 public class GameViewManagerLevel_01 extends Thread
 {
     private AnchorPane gamePane;
@@ -114,7 +116,7 @@ public class GameViewManagerLevel_01 extends Thread
     private ImageView blueArrow;
     private ImageView greenArrow;
 
-
+    private boolean stop = false;
 
 
 
@@ -161,6 +163,7 @@ public class GameViewManagerLevel_01 extends Thread
                 //showMuzzleFlash(pickedCar);
                 //fire(pickedCar);
 
+
             }
         };
 
@@ -185,7 +188,7 @@ public class GameViewManagerLevel_01 extends Thread
     }
 
     public void run() {
-        while (true)
+        while (stop==false) //thread ending condition
         {
                 /*try {
                     for (int i = 0; i < ammoBox.size(); i++) {
@@ -210,6 +213,7 @@ public class GameViewManagerLevel_01 extends Thread
 
                 for(int i=0; i<ammoBox.size(); i++)
                 {
+                   
                     if(isFireKeyReleased==true && ammoBox.get(i).getLayoutY()==1000 ) //wystrzal
                     {
                         ammoBox.get(i).setLayoutY(car.getLayoutY()+muzzleY);
@@ -228,6 +232,8 @@ public class GameViewManagerLevel_01 extends Thread
                     if(ammoBox.get(i).getLayoutY()<=-50)
                     {
                         ammoBox.get(i).setLayoutY(1000);
+                        ammoBox.get(i).setLayoutX(1000);
+
                     }
                 }
             try {
@@ -249,6 +255,7 @@ public class GameViewManagerLevel_01 extends Thread
         {
             bulletImage = new ImageView(BULLET_PATH);
             bulletImage.setLayoutY(1000);
+            bulletImage .setLayoutX(1000);
             gamePane.getChildren().add(bulletImage);
             ammoBox.add(bulletImage);
         }
@@ -622,6 +629,8 @@ public class GameViewManagerLevel_01 extends Thread
         gameStage.close();
         gameTimer.stop();
         menuStage.show();
+        stop = true;// stop the bullets thread
+
 
 
 
