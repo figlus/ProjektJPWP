@@ -11,21 +11,14 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
-import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import model.*;
-import sample.Main;
 
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Time;
 import java.io.PrintWriter;
 import java.util.*;
-import javax.swing.JFrame;
 
 public class MainMenu
 {
@@ -98,12 +91,15 @@ public class MainMenu
     {
         return mainStage;
     }
+
     public void createBackground()
     {
         Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
         mainPane.setBackground(new Background(background));
     }
+
+
     private void createMainMenuSounds()
     {
         buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
@@ -325,7 +321,7 @@ public class MainMenu
             totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
             if(pickedCar!=null)
             {
-                GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                GameViewManager gameViewManager = new GameViewManager();
                 gameViewManager.createNewGame(mainStage,pickedCar);
             }
             else{
@@ -479,7 +475,7 @@ public class MainMenu
             public void handle(ActionEvent actionEvent) {
                 if(pickedCar!=null)
                 {
-                    GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                    GameViewManager gameViewManager = new GameViewManager();
                     gameViewManager.createNewGame(mainStage,pickedCar);
                 }
                 if(pickedCar==null)

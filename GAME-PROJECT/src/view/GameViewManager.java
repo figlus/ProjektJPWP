@@ -2,15 +2,12 @@ package view;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 
@@ -30,7 +27,7 @@ import java.util.TimerTask;
 
 
 
-public class GameViewManagerLevel_01
+public class GameViewManager
 {
     private AnchorPane gamePane;
     private Scene gameScene;
@@ -91,7 +88,7 @@ public class GameViewManagerLevel_01
     private ImageView bulletImage;
     private final static String BULLET_PATH = "view/resources/bullet.png";
     private List<ImageView> ammoBox = new ArrayList<>();
-    private int bulletSpeed = 7;
+    private int bulletSpeed = 9;
 
 
     private AudioClip gunFireSoundEffect;
@@ -102,6 +99,9 @@ public class GameViewManagerLevel_01
     private AudioClip bonusLostSoundEffect;
     private AudioClip lowHPalarmSoundEffect;
     private AudioClip gameOverSoundEffect;
+    private AudioClip carLoop;
+    private AudioClip carBrake;
+
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
     private ImageView fireImage;
@@ -123,8 +123,12 @@ public class GameViewManagerLevel_01
     private int bulletsFly= 0;
     private AnimationTimer bulletsTimer;
 
+    private boolean isLeftKeyTyped;
+    private boolean isRightKeyTyped;
+    private boolean isDownKeyTyped;
 
-    public GameViewManagerLevel_01()
+
+    public GameViewManager()
     {
         initializeStage();
         createKeyListeners();
@@ -146,7 +150,8 @@ public class GameViewManagerLevel_01
 
 
 
-        //start();
+
+
         speedUpTheGame();
         createGameLoop(pickedCar);
         createBulletLoop(pickedCar);
@@ -160,6 +165,7 @@ public class GameViewManagerLevel_01
             public void handle(long l) {
 
                 fireGun();
+                //checkIfCarMakesBrakingSound();
             }
         };
         bulletsTimer.start();
@@ -176,9 +182,11 @@ public class GameViewManagerLevel_01
                 checkIfElementsAreBehindScreenAndRelocateThem();
                 checkIfElementsCollide(pickedCar);
                 checkIfBulletsAndElementsCollide(pickedCar);
+
                 moveCar();
                 showMuzzleFlash(pickedCar);
                 //fire(pickedCar);
+
 
 
             }
@@ -200,7 +208,7 @@ public class GameViewManagerLevel_01
                 //fireImage.setLayoutX(car.getLayoutX()+muzzleX-23);
                 //fireImage.setLayoutY(car.getLayoutY()+muzzleY-24);
 
-                gunFireSoundEffect.play(0.5);
+                gunFireSoundEffect.play(0.3);
                 isFireKeyReleased=false;
 
             }
@@ -225,14 +233,35 @@ public class GameViewManagerLevel_01
     private void createGameSoundEffects()
     {
 
-        gunFireSoundEffect = new AudioClip(Paths.get("gunShot01.mp3").toUri().toString());
+        gunFireSoundEffect = new AudioClip(Paths.get("gunFireSoundEffect.wav").toUri().toString());
+        gunFireSoundEffect.setVolume(0.5);
         collisionSoundEffect = new AudioClip(Paths.get("collision.wav").toUri().toString());
+        collisionSoundEffect.setVolume(0.2);
         starCollestedSoundEffect = new AudioClip(Paths.get("starCollected.wav").toUri().toString());
         greenArrowCollectedSoundEffect = new AudioClip(Paths.get("arrowCollected.wav").toUri().toString());
+        greenArrowCollectedSoundEffect.setVolume(0.1);
         blueArrowCollectedSoundEffect = new AudioClip(Paths.get("blueArrow.wav").toUri().toString());
         lowHPalarmSoundEffect = new AudioClip(Paths.get("lowHPalarm.wav").toUri().toString());
+        lowHPalarmSoundEffect.setVolume(0.5);
         bonusLostSoundEffect = new AudioClip(Paths.get("bonusLost.wav").toUri().toString());
+        bonusLostSoundEffect.setVolume(0.2);
         gameOverSoundEffect = new AudioClip(Paths.get("gameOver.mp3").toUri().toString());
+        gameOverSoundEffect.setVolume(0.1);
+        carLoop = new AudioClip(Paths.get("carLoop2.wav").toUri().toString());
+        carBrake = new AudioClip(Paths.get("carBrake.wav").toUri().toString());
+        carBrake.setPriority(5);
+
+        //Media backgroundSoundEffect = new Media(Paths.get("C:\\Users\\rafal\\Pulpit\\Repozytorium\\ProjektJPWP\\GAME-PROJECT\\carLoop2.wav").toUri().toString());
+        //MediaPlayer mediaPlayer = new MediaPlayer(backgroundSoundEffect);
+        //mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        //mediaPlayer.play();
+
+        carLoop.setCycleCount(AudioClip.INDEFINITE);
+        carLoop.setPriority(10);
+        carLoop.play(0.5);
+
+
+
 
         //carSound = new Media(Paths.get("8bitCarSound.wav").toUri().toString());
         //mediaPlayer = new MediaPlayer(carSound);
@@ -259,7 +288,28 @@ public class GameViewManagerLevel_01
         }
     }
 
-
+    private void checkIfCarMakesBrakingSound()
+    {
+        if(isLeftKeyTyped==true && carBrake.isPlaying()==false)
+        {
+            carBrake.play();
+            isLeftKeyTyped=false;
+        }
+        if(isRightKeyPressed==true && carBrake.isPlaying()==false)
+        {
+            carBrake.play();
+            isRightKeyTyped=false;
+        }
+        if(isDownKeyPressed==true && carBrake.isPlaying())
+        {
+            carBrake.play();
+            isDownKeyTyped=false;
+        }
+        if(isLeftKeyPressed==false && isRightKeyPressed==false && isDownKeyPressed==false)
+        {
+            carBrake.stop();
+        }
+    }
 
    private void showMuzzleFlash(CAR pickedCar)
     {
@@ -622,17 +672,13 @@ public class GameViewManagerLevel_01
         playerLife--;
         if(playerLife==0)
         {
-            lowHPalarmSoundEffect.play();
+            lowHPalarmSoundEffect.play(0.5);
+
         }
 
         if(playerLife <0)
         {
-            gameOverSoundEffect.play(0.5);
-            JOptionPane.showMessageDialog(null,"Game Over!");
-
             endRound();
-
-
         }
 
     }
@@ -645,6 +691,9 @@ public class GameViewManagerLevel_01
                     entry.setValue(inGamePoints);
             }
         }
+        carLoop.stop();
+        gameOverSoundEffect.play();
+        JOptionPane.showMessageDialog(null,"Game Over!");
         gameStage.close();
         gameTimer.stop();
         bulletsTimer.stop();
@@ -683,15 +732,9 @@ public class GameViewManagerLevel_01
        fireImage.setLayoutY(3000);
        fireImage.setLayoutX(3000);
 
-       //creating small bullet impact explosion
-       //smallBulletImpactExplosion = new ImageView(SMALL_IMPACT_EXPLOSION_PATH);
-       //smallBulletImpactExplosion.setLayoutY(3000);
-       //smallBulletImpactExplosion.setLayoutX(3000);
-       //gamePane.getChildren().add(smallBulletImpactExplosion);
-
 
        //creating road obstacles
-        smallObstacleRock = new ImageView[7];
+        smallObstacleRock = new ImageView[8];
         for(int i=0; i<smallObstacleRock.length; i++)
         {
             smallObstacleRock[i] = new ImageView(smallObstacleRock_PATH);
@@ -699,14 +742,14 @@ public class GameViewManagerLevel_01
             gamePane.getChildren().add(smallObstacleRock[i]);
         }
         //creating HP array for Rocks
-        smallObstacleRockHP = new int[7];
+        smallObstacleRockHP = new int[8];
         for(int i=0; i<smallObstacleRockHP.length; i++)
         {
             smallObstacleRockHP[i]=smallObstacleHealthPoints;
         }
 
 
-        smallObstacleRoadBlock = new ImageView[4];
+        smallObstacleRoadBlock = new ImageView[7];
         for(int i=0; i<smallObstacleRoadBlock.length; i++)
         {
             smallObstacleRoadBlock[i] = new ImageView(smallObstacleRoadBlock_PATH);
@@ -714,7 +757,7 @@ public class GameViewManagerLevel_01
             gamePane.getChildren().add(smallObstacleRoadBlock[i]);
         }
         //creating HP array for road blocks
-        smallObstacleRoadBlockHP = new int[4];
+        smallObstacleRoadBlockHP = new int[7];
        for(int i=0; i<smallObstacleRoadBlockHP.length; i++)
        {
            smallObstacleRoadBlockHP[i]=smallObstacleHealthPoints;
@@ -809,7 +852,7 @@ public class GameViewManagerLevel_01
        }
    }
 
-    private void createKeyListeners()
+    private void createKeyListeners()//controller
     {
         gameScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -841,10 +884,12 @@ public class GameViewManagerLevel_01
                 if(keyEvent.getCode()== KeyCode.LEFT)
                 {
                     isLeftKeyPressed=false;
+
                 }
                 else if (keyEvent.getCode()==KeyCode.RIGHT)
                 {
                     isRightKeyPressed=false;
+
                 }
 
                 if(keyEvent.getCode()==KeyCode.UP)
@@ -855,11 +900,29 @@ public class GameViewManagerLevel_01
                 {
                     isDownKeyPressed=false;
 
+
                 }
 
                 if(keyEvent.getCode()==KeyCode.F)
                 {
                     isFireKeyReleased = true;
+                }
+            }
+        });
+        gameScene.setOnKeyTyped(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode()==KeyCode.LEFT)
+                {
+                    isLeftKeyTyped=true;
+                }
+                if(keyEvent.getCode()==KeyCode.RIGHT)
+                {
+                   isRightKeyTyped=true;
+                }
+                if(keyEvent.getCode()==KeyCode.DOWN)
+                {
+                    isDownKeyTyped=true;
                 }
             }
         });
@@ -869,7 +932,7 @@ public class GameViewManagerLevel_01
     private void setNewElementPosition(ImageView imageView) //ta funkcja wyrzuca elementy poza zasieg widzenia na drodze przejazdu samochodu ! !
     {
         imageView.setLayoutX(randomPositionGenerator.nextInt(650)+50);
-        imageView.setLayoutY(-(randomPositionGenerator.nextInt(5000)+1000));
+        imageView.setLayoutY(-(randomPositionGenerator.nextInt(6000)+1000));
     }
     private void setRareElementPosition(ImageView imageView)
     {
@@ -883,7 +946,7 @@ public class GameViewManagerLevel_01
     }
 
 
-    private void moveCar()
+    private void moveCar()//controller
     {
 
         if(isLeftKeyPressed && !isRightKeyPressed)
@@ -952,7 +1015,7 @@ public class GameViewManagerLevel_01
     }
 
 
-    private void moveBackground()
+    private void moveBackground()//controller
     {
         gridPane1.setLayoutY(gridPane1.getLayoutY()+backgroundRollingSpeed);
         gridPane2.setLayoutY(gridPane2.getLayoutY()+backgroundRollingSpeed);
