@@ -30,10 +30,11 @@ public class GameOverSubscene extends SubScene
         backgroundImage = new BackgroundImage(image,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.DEFAULT,null);
         AnchorPane root2 = (AnchorPane) this.getRoot();
         root2.setBackground(new Background(backgroundImage));
-        this.setVisible(false);
-        setLayoutX(100);
-        setLayoutY(200);
+
+
+
     }
+
 
     public AnchorPane getPane()
     {

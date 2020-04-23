@@ -106,6 +106,7 @@ public class GameViewManager
     private AudioClip gameOverSoundEffect;
     private AudioClip carLoop;
     private AudioClip carBrake;
+    private AudioClip buttonClick;
 
 
     private final static String FIRE_IMAGE_PATH = "view/resources/fire.png";
@@ -260,6 +261,7 @@ public class GameViewManager
         carLoop = new AudioClip(Paths.get("carLoop2.wav").toUri().toString());
         carBrake = new AudioClip(Paths.get("carBrake.wav").toUri().toString());
         carBrake.setPriority(5);
+        buttonClick = new AudioClip(Paths.get("menuButtonSoundVolume3.wav").toUri().toString());
 
         //Media backgroundSoundEffect = new Media(Paths.get("C:\\Users\\rafal\\Pulpit\\Repozytorium\\ProjektJPWP\\GAME-PROJECT\\carLoop2.wav").toUri().toString());
         //MediaPlayer mediaPlayer = new MediaPlayer(backgroundSoundEffect);
@@ -1047,9 +1049,11 @@ public class GameViewManager
     private void createGameOverSubscene(Stage mainStage,CAR pickedCar)
     {
         gameOverSubscene = new GameOverSubscene();
-        gameOverSubscene.setLayoutY(350);
+
         gamePane.getChildren().add(gameOverSubscene);
         gameOverSubscene.setVisible(false);
+        gameOverSubscene.setLayoutY(350);
+        gameOverSubscene.setLayoutX(100);
 
 
         try {
@@ -1061,6 +1065,7 @@ public class GameViewManager
         next.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                buttonClick.play();
                 gameOverSoundEffect.stop();
                 endRound();
             }
@@ -1068,6 +1073,7 @@ public class GameViewManager
         retry.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                buttonClick.play();
                 saveScore();
                 gameStage.close();
                 gameOverSoundEffect.stop(); //end current round and start another one !
