@@ -697,7 +697,7 @@ public class GameViewManager
 
     }
 
-    private void endRound()
+    private void saveScore()
     {
         for (Map.Entry<String, Integer> entry : MainMenu.scoreSave.entrySet()) {
             if(entry.getKey().equals(MainMenu.userNick)){
@@ -705,7 +705,12 @@ public class GameViewManager
                     entry.setValue(inGamePoints);
             }
         }
+    }
 
+    private void endRound()
+    {
+
+        saveScore();
         gameStage.close();
         menuStage.show();
     }
@@ -1063,6 +1068,7 @@ public class GameViewManager
         retry.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                saveScore();
                 gameStage.close();
                 gameOverSoundEffect.stop(); //end current round and start another one !
                 GameViewManager gameViewManager = new GameViewManager();
