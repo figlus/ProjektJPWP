@@ -72,7 +72,6 @@ public class GameViewManager
     private final static int bigObstacleHealthPoints = 5;
     private final static String smallObstacleRoadBlock_PATH = "view/resources/smallObstacles/smallObstacleRoadBlock.png";
     private final static String smallObstacleRock_PATH = "view/resources/smallObstacles/smallObstacleRock.png";
-    private final static String smallObstacleBranch_PATH = "view/resources/smallObstacles/smallObstacleBranch.png";
     private final static String bigObstacleVendingMachine_PATH="view/resources/bigObstacles/bigObstacleVendingMachine.png";
 
     private Random randomPositionGenerator;

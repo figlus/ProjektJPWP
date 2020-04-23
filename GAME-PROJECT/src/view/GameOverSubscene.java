@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class GameOverSubscene extends SubScene
 {
-    public final static String FONT_PATH = "view/resources/Oswald-Medium.ttf";
+
     public final static String SUBSCENE_IMAGE_PATH = "view/resources/gameOver.png";
     public final static int prefLabelWidth = 600;
     public final static int prefLabelHeight = 250;

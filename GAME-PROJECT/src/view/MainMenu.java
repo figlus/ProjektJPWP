@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
@@ -334,10 +335,9 @@ public class MainMenu
         creditsSubscene = new MainMenuSubscenes();
         mainPane.getChildren().add(creditsSubscene);
 
-        helpSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(helpSubscene);
 
 
+        createHelpSubScene();
         createCarPickerSubscene();
         createLoginSubScene();
         createLevelPickerSubScene();
@@ -516,4 +516,69 @@ public class MainMenu
         }
         return sortedHashMap;
     }
+
+    public void createHelpSubScene()
+    {
+        helpSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(helpSubscene);
+
+        //Setting and displaying stars and bonuses - collectable
+        InfoLabel itemsToCollectLabel = new InfoLabel("Items to collect");
+        itemsToCollectLabel.setLayoutX(100);
+        itemsToCollectLabel.setLayoutY(50);
+
+        HBox itemsToCollectHbox = new HBox();
+        itemsToCollectHbox.setSpacing(30);
+        itemsToCollectHbox.setLayoutX(70);
+        itemsToCollectHbox.setLayoutY(100+20);
+        //itemsToCollectHbox.setPrefSize(540,200);
+
+        helpSubscene.getPane().getChildren().add(itemsToCollectHbox);
+        helpSubscene.getPane().getChildren().addAll(itemsToCollectLabel);
+
+        int resizeValue = 100;
+        ImageView goldStar = Config.goldStar;   goldStar.setFitHeight(resizeValue);  goldStar.setFitWidth(resizeValue);
+        ImageView blueArrow = Config.blueArrow; blueArrow.setFitHeight(resizeValue);    blueArrow.setFitWidth(resizeValue);
+        ImageView greenArrow = Config.greenArrow; greenArrow.setFitHeight(resizeValue); greenArrow.setFitWidth(resizeValue);
+        itemsToCollectHbox.getChildren().addAll(goldStar,blueArrow,greenArrow);
+
+        //Setting and displaying obstacles - items ought to be avoided and destroyed
+        InfoLabel obstaclesLabel = new InfoLabel("Obstacles");
+        helpSubscene.getPane().getChildren().add(obstaclesLabel);
+        obstaclesLabel.setLayoutX(100);
+        obstaclesLabel.setLayoutY(250);
+        HBox obstaclesHbox = new HBox();
+        obstaclesHbox.setSpacing(30);
+        obstaclesHbox.setLayoutX(70);
+        obstaclesHbox.setLayoutY(300+70);
+        helpSubscene.getPane().getChildren().add(obstaclesHbox);
+        ImageView rock = Config.smallObstacleRock;  rock.setFitHeight(70);  rock.setFitWidth(100);
+        ImageView roadBlock = Config.smallObstacleRoadBlock;    roadBlock.setFitHeight(80); roadBlock.setFitWidth(100);
+        ImageView vendingMachine = Config.bigObstacleVendingMachine;    vendingMachine.setFitHeight(150);   vendingMachine.setFitWidth(100);
+        obstaclesHbox.getChildren().addAll(rock,roadBlock,vendingMachine);
+
+        //Setting and displaying controls
+        InfoLabel controlsLabel = new InfoLabel("Controls");
+        ImageView controlsImage = Config.controlsImage;    controlsImage.setFitHeight(120);    controlsImage.setFitWidth(200);
+        controlsImage.setLayoutX(250-20);
+        controlsImage.setLayoutY(630);
+        helpSubscene.getPane().getChildren().add(controlsLabel);
+        helpSubscene.getPane().getChildren().add(controlsImage);
+        controlsLabel.setLayoutX(100);
+        controlsLabel.setLayoutY(550);
+
+        ImageView fireKey = new ImageView("view/resources/fireKey.png");
+        fireKey.setLayoutX(150-15-20);
+        fireKey.setLayoutY(630+5);
+        fireKey.setFitHeight(65);
+        fireKey.setFitWidth(65);
+        helpSubscene.getPane().getChildren().add(fireKey);
+
+
+
+
+
+    }
 }
+
+
