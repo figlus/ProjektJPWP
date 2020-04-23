@@ -1,5 +1,7 @@
 package view;
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -13,10 +15,13 @@ import javafx.stage.Stage;
 
 
 import model.CAR;
+import model.GameButton;
 import model.InGameLabel;
 
 
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +132,10 @@ public class GameViewManager
     private boolean isRightKeyTyped;
     private boolean isDownKeyTyped;
 
+    private GameOverSubscene gameOverSubscene;
+    private GameButton next;
+    private GameButton retry;
+
 
     public GameViewManager()
     {
@@ -147,6 +156,7 @@ public class GameViewManager
         createCar(pickedCar);
         createGameElements(pickedCar);
         createAmmoBox();
+        createGameOverSubscene(menuStage,pickedCar);
 
 
 
@@ -678,7 +688,11 @@ public class GameViewManager
 
         if(playerLife <0)
         {
-            endRound();
+            carLoop.stop();
+            gameTimer.stop();
+            bulletsTimer.stop();
+            gameOverSoundEffect.play();
+            gameOverSubscene.setVisible(true);
         }
 
     }
@@ -691,19 +705,9 @@ public class GameViewManager
                     entry.setValue(inGamePoints);
             }
         }
-        carLoop.stop();
-        gameOverSoundEffect.play();
-        JOptionPane.showMessageDialog(null,"Game Over!");
+
         gameStage.close();
-        gameTimer.stop();
-        bulletsTimer.stop();
         menuStage.show();
-
-
-
-
-
-
     }
 
    private void createGameElements(CAR pickedCar)
@@ -1034,6 +1038,48 @@ public class GameViewManager
             gridPane2.setLayoutY(-1200);
         }
     }
+
+    private void createGameOverSubscene(Stage mainStage,CAR pickedCar)
+    {
+        gameOverSubscene = new GameOverSubscene();
+        gameOverSubscene.setLayoutY(350);
+        gamePane.getChildren().add(gameOverSubscene);
+        gameOverSubscene.setVisible(false);
+
+
+        try {
+            next = new GameButton("NEXT");
+            retry = new GameButton("RETRY");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        next.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                gameOverSoundEffect.stop();
+                endRound();
+            }
+        });
+        retry.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                gameStage.close();
+                gameOverSoundEffect.stop(); //end current round and start another one !
+                GameViewManager gameViewManager = new GameViewManager();
+                gameViewManager.createNewGame(mainStage,pickedCar);
+            }
+        });
+
+        gameOverSubscene.getPane().getChildren().add(next);
+        gameOverSubscene.getPane().getChildren().add(retry);
+        next.setLayoutX(220);
+        next.setLayoutY(75);
+        retry.setLayoutX(220);
+        retry.setLayoutY(200-30);
+
+
+    }
+
 
 
 

@@ -486,34 +486,9 @@ public class MainMenu
         });
 
     }
-    private void createLevel_02Button() throws FileNotFoundException
-    {
-        GameButton level02Button = new GameButton("Level 2");
-        addLevelButton(level02Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_03Button() throws FileNotFoundException
-    {
-        GameButton level03Button = new GameButton("Level 3");
-        addLevelButton(level03Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_04Button() throws FileNotFoundException
-    {
-        GameButton level04Button = new GameButton("Level 4");
-        addLevelButton(level04Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_05Button() throws FileNotFoundException
-    {
-        GameButton level05Button = new GameButton("Level 5");
-        addLevelButton(level05Button);
-
-        //miejsce na actionListener
-    }
     private void createButtons() throws FileNotFoundException {
         createLoginButton();
         createStartButton();
@@ -525,10 +500,7 @@ public class MainMenu
 
 
         createLevel_01Button();
-        createLevel_02Button();
-        createLevel_03Button();
-        createLevel_04Button();
-        createLevel_05Button();
+
     }
 
     private static HashMap sortByValues(HashMap map) {
