@@ -179,7 +179,7 @@ public class MainMenu
         pickLevelLabel.setLayoutY(20);
         levelPickerSubScene.getPane().getChildren().add(pickLevelLabel);
     }
-    private void createLoginSubScene()
+    private void createLoginSubScene()  throws FileNotFoundException
     {
         loginSubscene = new MainMenuSubscenes();
         mainPane.getChildren().add(loginSubscene);
@@ -188,9 +188,9 @@ public class MainMenu
         TextField userNameTextField = new TextField();
         textFieldHashMap.put("userName", userNameTextField);
 
-        Button loginButton = new Button("LOG IN");
+        GameButton loginButton1 = new GameButton("LOG IN");
 
-            loginButton.setOnAction((event) -> {
+            loginButton1.setOnAction((event) -> {
                 String test = textFieldHashMap.get("userName").getText();
 
                 if (userNick.equals("Not logged in")){
@@ -227,18 +227,16 @@ public class MainMenu
         userNameTextField.setPrefWidth(200);
         userNameTextField.setPrefHeight(50);
 
-        loginButton.setLayoutX(300);
-        loginButton.setLayoutY(100);
-        loginButton.setPrefWidth(100);
-        loginButton.setPrefHeight(50);
+        loginButton1.setLayoutX(300);
+        loginButton1.setLayoutY(100);
 
-        loginSubscene.getPane().getChildren().addAll(userNameTextField, loginButton);
+        loginSubscene.getPane().getChildren().addAll(userNameTextField, loginButton1);
 
 
         TextField newNameTextField = new TextField();
         textFieldHashMap.put("newName", newNameTextField);
 
-        Button createButton = new Button("CREATE");
+       GameButton createButton = new GameButton("CREATE");
         createButton.setOnAction((event) -> {
             String test = textFieldHashMap.get("newName").getText();
             boolean been = false;
@@ -258,8 +256,6 @@ public class MainMenu
 
         createButton.setLayoutX(300);
         createButton.setLayoutY(300);
-        createButton.setPrefWidth(100);
-        createButton.setPrefHeight(50);
 
         loginSubscene.getPane().getChildren().addAll(newNameTextField, createButton);
 
@@ -306,14 +302,12 @@ public class MainMenu
         subScene.moveMainMenuSubscene();
         sceneToHide=subScene;
     }
-    private void createCarPickerSubscene(){
+    private void createCarPickerSubscene() throws FileNotFoundException{
         carPickerSubscene = new MainMenuSubscenes();
         mainPane.getChildren().add(carPickerSubscene);
-        Button playButton = new Button("PLAY");
-        playButton.setLayoutX(350);
+        GameButton playButton = new GameButton("PLAY");
+        playButton.setLayoutX(300);
         playButton.setLayoutY(650);
-        playButton.setPrefWidth(100);
-        playButton.setPrefHeight(50);
         playButton.setOnAction((event) -> {
             totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
             if(pickedCar!=null)
@@ -330,7 +324,7 @@ public class MainMenu
         }
 
 
-    private void createMainMenuSubscenes()
+    private void createMainMenuSubscenes() throws FileNotFoundException
     {
         creditsSubscene = new MainMenuSubscenes();
         mainPane.getChildren().add(creditsSubscene);
