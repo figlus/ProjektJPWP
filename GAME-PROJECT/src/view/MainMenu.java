@@ -8,24 +8,18 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
-import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import model.*;
-import sample.Main;
 
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Time;
 import java.io.PrintWriter;
 import java.util.*;
-import javax.swing.JFrame;
 
 public class MainMenu
 {
@@ -60,11 +54,7 @@ public class MainMenu
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
-    public static boolean isLevelOneCopleted = false;
-    public static boolean isLevelTwoCompleted = false;
-    public static boolean isLevelThreeCompleted = false;
-    public static boolean isLeveLFourCompleted = false;
-    public static boolean isLevelFiveCompleted = false;
+
 
 
     private static HashMap<String, Integer> players;
@@ -98,12 +88,15 @@ public class MainMenu
     {
         return mainStage;
     }
+
     public void createBackground()
     {
         Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
         mainPane.setBackground(new Background(background));
     }
+
+
     private void createMainMenuSounds()
     {
         buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
@@ -325,7 +318,7 @@ public class MainMenu
             totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
             if(pickedCar!=null)
             {
-                GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                GameViewManager gameViewManager = new GameViewManager();
                 gameViewManager.createNewGame(mainStage,pickedCar);
             }
             else{
@@ -342,10 +335,9 @@ public class MainMenu
         creditsSubscene = new MainMenuSubscenes();
         mainPane.getChildren().add(creditsSubscene);
 
-        helpSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(helpSubscene);
 
 
+        createHelpSubScene();
         createCarPickerSubscene();
         createLoginSubScene();
         createLevelPickerSubScene();
@@ -377,6 +369,7 @@ public class MainMenu
             }
             else {
                 showSubscene((loginSubscene));
+                buttonClickSound.play();
             }
         });
 
@@ -451,6 +444,7 @@ public class MainMenu
             zapis.close();
 
             mainStage.close();
+            System.exit(1);
         });
 
     }
@@ -477,7 +471,7 @@ public class MainMenu
             public void handle(ActionEvent actionEvent) {
                 if(pickedCar!=null)
                 {
-                    GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                    GameViewManager gameViewManager = new GameViewManager();
                     gameViewManager.createNewGame(mainStage,pickedCar);
                 }
                 if(pickedCar==null)
@@ -488,34 +482,9 @@ public class MainMenu
         });
 
     }
-    private void createLevel_02Button() throws FileNotFoundException
-    {
-        GameButton level02Button = new GameButton("Level 2");
-        addLevelButton(level02Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_03Button() throws FileNotFoundException
-    {
-        GameButton level03Button = new GameButton("Level 3");
-        addLevelButton(level03Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_04Button() throws FileNotFoundException
-    {
-        GameButton level04Button = new GameButton("Level 4");
-        addLevelButton(level04Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_05Button() throws FileNotFoundException
-    {
-        GameButton level05Button = new GameButton("Level 5");
-        addLevelButton(level05Button);
-
-        //miejsce na actionListener
-    }
     private void createButtons() throws FileNotFoundException {
         createLoginButton();
         createStartButton();
@@ -527,10 +496,7 @@ public class MainMenu
 
 
         createLevel_01Button();
-        createLevel_02Button();
-        createLevel_03Button();
-        createLevel_04Button();
-        createLevel_05Button();
+
     }
 
     private static HashMap sortByValues(HashMap map) {
@@ -550,4 +516,69 @@ public class MainMenu
         }
         return sortedHashMap;
     }
+
+    public void createHelpSubScene()
+    {
+        helpSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(helpSubscene);
+
+        //Setting and displaying stars and bonuses - collectable
+        InfoLabel itemsToCollectLabel = new InfoLabel("Items to collect");
+        itemsToCollectLabel.setLayoutX(100);
+        itemsToCollectLabel.setLayoutY(50);
+
+        HBox itemsToCollectHbox = new HBox();
+        itemsToCollectHbox.setSpacing(30);
+        itemsToCollectHbox.setLayoutX(70);
+        itemsToCollectHbox.setLayoutY(100+20);
+        //itemsToCollectHbox.setPrefSize(540,200);
+
+        helpSubscene.getPane().getChildren().add(itemsToCollectHbox);
+        helpSubscene.getPane().getChildren().addAll(itemsToCollectLabel);
+
+        int resizeValue = 100;
+        ImageView goldStar = Config.goldStar;   goldStar.setFitHeight(resizeValue);  goldStar.setFitWidth(resizeValue);
+        ImageView blueArrow = Config.blueArrow; blueArrow.setFitHeight(resizeValue);    blueArrow.setFitWidth(resizeValue);
+        ImageView greenArrow = Config.greenArrow; greenArrow.setFitHeight(resizeValue); greenArrow.setFitWidth(resizeValue);
+        itemsToCollectHbox.getChildren().addAll(goldStar,blueArrow,greenArrow);
+
+        //Setting and displaying obstacles - items ought to be avoided and destroyed
+        InfoLabel obstaclesLabel = new InfoLabel("Obstacles");
+        helpSubscene.getPane().getChildren().add(obstaclesLabel);
+        obstaclesLabel.setLayoutX(100);
+        obstaclesLabel.setLayoutY(250);
+        HBox obstaclesHbox = new HBox();
+        obstaclesHbox.setSpacing(30);
+        obstaclesHbox.setLayoutX(70);
+        obstaclesHbox.setLayoutY(300+70);
+        helpSubscene.getPane().getChildren().add(obstaclesHbox);
+        ImageView rock = Config.smallObstacleRock;  rock.setFitHeight(70);  rock.setFitWidth(100);
+        ImageView roadBlock = Config.smallObstacleRoadBlock;    roadBlock.setFitHeight(80); roadBlock.setFitWidth(100);
+        ImageView vendingMachine = Config.bigObstacleVendingMachine;    vendingMachine.setFitHeight(150);   vendingMachine.setFitWidth(100);
+        obstaclesHbox.getChildren().addAll(rock,roadBlock,vendingMachine);
+
+        //Setting and displaying controls
+        InfoLabel controlsLabel = new InfoLabel("Controls");
+        ImageView controlsImage = Config.controlsImage;    controlsImage.setFitHeight(120);    controlsImage.setFitWidth(200);
+        controlsImage.setLayoutX(250-20);
+        controlsImage.setLayoutY(630);
+        helpSubscene.getPane().getChildren().add(controlsLabel);
+        helpSubscene.getPane().getChildren().add(controlsImage);
+        controlsLabel.setLayoutX(100);
+        controlsLabel.setLayoutY(550);
+
+        ImageView fireKey = new ImageView("view/resources/fireKey.png");
+        fireKey.setLayoutX(150-15-20);
+        fireKey.setLayoutY(630+5);
+        fireKey.setFitHeight(65);
+        fireKey.setFitWidth(65);
+        helpSubscene.getPane().getChildren().add(fireKey);
+
+
+
+
+
+    }
 }
+
+
