@@ -4,12 +4,12 @@ public enum CAR
 {
     CAR_LEVEL_01("view/resources/cars/redCarBigger.png","view/resources/lifeIndicator.png",3,1,0,false,false,
             23,25,35,23,25,94,23,-10),
-    CAR_LEVEL_02("view/resources/cars/yellowCar1.png","view/resources/lifeIndicator.png",5,2,200,false,false,
+    CAR_LEVEL_02("view/resources/cars/yellowCar1.png","view/resources/lifeIndicator.png",5,2,1000,false,false,
             23,25,35,23,25,94,25,-10),
-    CAR_LEVEL_03("view/resources/cars/blueCar.png","view/resources/lifeIndicator.png",3,5,300,false,false,
+    CAR_LEVEL_03("view/resources/cars/blueCar.png","view/resources/lifeIndicator.png",3,5,3000,false,false,
             23,25,25,23,25,92,23,4),
-    MOTORBOAT_01("view/resources/cars/motorBoat.png","view/resources/lifeIndicator.png",5,2,500,false,true,
-            22,24,33,23,24,77,24,38);
+    CAR_LEVEL_04("view/resources/cars/greyCar.png","view/resources/lifeIndicator.png",7,1,5000,false,true,
+            22,24,33,23,24,77,23,0);
 
 
     String urlLifeIndicator;

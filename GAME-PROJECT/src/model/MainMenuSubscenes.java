@@ -50,6 +50,8 @@ public class MainMenuSubscenes extends SubScene
             isHidden=true;
         }
         transition.play();
+
+
     }
     public AnchorPane getPane(){return (AnchorPane) this.getRoot();}
 }

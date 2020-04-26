@@ -8,26 +8,18 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
-import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import model.*;
-import sample.Main;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Time;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JFrame;
+import java.util.*;
 
 public class MainMenu
 {
@@ -43,6 +35,7 @@ public class MainMenu
     private MainMenuSubscenes helpSubscene;
     private MainMenuSubscenes sceneToHide;
     private MainMenuSubscenes carPickerSubscene;
+    private MainMenuSubscenes scoreSubscene;
 
     MainMenuSubscenes loginSubscene;
     MainMenuSubscenes levelPickerSubScene;
@@ -61,20 +54,18 @@ public class MainMenu
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
     private AnimationTimer mainMenuTimer;
 
-    public static boolean isLevelOneCopleted = false;
-    public static boolean isLevelTwoCompleted = false;
-    public static boolean isLevelThreeCompleted = false;
-    public static boolean isLeveLFourCompleted = false;
-    public static boolean isLevelFiveCompleted = false;
 
 
-    private HashMap<String, Integer> players;
+
+    private static HashMap<String, Integer> players;
+    public static  HashMap<String, Integer> scoreSave;
 
     private AudioClip buttonClickSound;
     private boolean beenLagged = false;
 
-    public MainMenu(HashMap<String, Integer> players) throws FileNotFoundException
+    public MainMenu(HashMap<String, Integer> players, HashMap<String, Integer> scoreSave) throws FileNotFoundException
     {   this.players = players;
+        this.scoreSave = scoreSave;
         mainPane = new AnchorPane();
         mainStage = new Stage();
         mainScene = new Scene(mainPane,1200,1000);
@@ -90,16 +81,26 @@ public class MainMenu
         createMainMenuSounds();
         createMainMenuLoop();
 
-
         carPickerSubscene.getPane().getChildren().add(createCarPicker());
-
-
-
-
-
-
     }
 
+    public Stage getMainStage()
+    {
+        return mainStage;
+    }
+
+    public void createBackground()
+    {
+        Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
+        mainPane.setBackground(new Background(background));
+    }
+
+
+    private void createMainMenuSounds()
+    {
+        buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
+    }
     private void createMainMenuLoop()
     {
         mainMenuTimer = new AnimationTimer() {
@@ -150,14 +151,11 @@ public class MainMenu
                         carToPick.setIsCircleChoosen(true);
                         pickedCar = carToPick.getCar();
 
-                        totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
-                        //pickedCar.setIsBoughtToTrue();
                     }
                     else
                     {
                         pickedCar=null;
                         carToPick.setIsCircleChoosen(false);
-                        System.out.println("Za malo punktow");
                         JOptionPane.showMessageDialog(null,"Not enough points"); //narazie niech zostanie opcja z messageDialog
                     }
 
@@ -169,10 +167,7 @@ public class MainMenu
         box.setLayoutY(80);
         return box;
     }
-    private void createMainMenuSounds()
-    {
-        buttonClickSound = new AudioClip(Paths.get("menuButtonSoundVolume2.wav").toUri().toString());
-    }
+
 
     private void createLevelPickerSubScene()
     {
@@ -184,7 +179,6 @@ public class MainMenu
         pickLevelLabel.setLayoutY(20);
         levelPickerSubScene.getPane().getChildren().add(pickLevelLabel);
     }
-
     private void createLoginSubScene()
     {
         loginSubscene = new MainMenuSubscenes();
@@ -207,7 +201,7 @@ public class MainMenu
                             userNick=entry.getKey();
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
                 else{
@@ -221,9 +215,10 @@ public class MainMenu
                             beenLagged = true;
                             totalCollectedPointsValue = entry.getValue();
                             userNick=entry.getKey();
+
                         }
                     }
-                    if (beenLagged){JOptionPane.showMessageDialog(null, "Logged");}
+                    if (beenLagged){showSubscene(carPickerSubscene);}
                     else{JOptionPane.showMessageDialog(null, "This user does not exist");}
                 }
             });
@@ -253,7 +248,7 @@ public class MainMenu
                 }
             }
             if (been){JOptionPane.showMessageDialog(null, "This user already exists");}
-            else{players.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
+            else{players.put(test,0); scoreSave.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
         });
 
         newNameTextField.setLayoutX(100);
@@ -279,31 +274,28 @@ public class MainMenu
         loginSubscene.getPane().getChildren().add(loginLabel2);
 
     }
-
-    public Stage getMainStage()
+    private void createScoreSubscene()
     {
-        return mainStage;
-    }
-    public void createBackground()
-    {
-        Image backgroundImage = new Image("view/resources/MAIN_MENU.png",1200,1000,false,true);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,null);
-        mainPane.setBackground(new Background(background));
-    }
+       scoreSubscene = new MainMenuSubscenes();
+       mainPane.getChildren().add(scoreSubscene);
 
-    private void createMainMenuSubscenes()
-    {
-        creditsSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(creditsSubscene);
+        InfoLabel scoreTitle = new InfoLabel("TOP SCORE");
+        scoreTitle.setLayoutX(100);
+        scoreTitle.setLayoutY(20);
+        scoreSubscene.getPane().getChildren().add(scoreTitle);
+        int i =0;
+        int xPlayser = 75;
+        int yPlayser = 100;
+        scoreSave = sortByValues(scoreSave);
+        for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
+                ScoreLabel usersName = new ScoreLabel(i+1 +". "+ entry.getKey() + "     " + (entry.getValue()));
+                usersName.setLayoutX(xPlayser);
+                usersName.setLayoutY(yPlayser + 60*i );
+                scoreSubscene.getPane().getChildren().add(usersName);
+                if (i>9){break;}
+                i++;
+        }
 
-        helpSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(helpSubscene);
-
-        carPickerSubscene = new MainMenuSubscenes();
-        mainPane.getChildren().add(carPickerSubscene);
-
-        createLoginSubScene();
-        createLevelPickerSubScene();
     }
     private void showSubscene(MainMenuSubscenes subScene)
     {
@@ -313,6 +305,43 @@ public class MainMenu
         }
         subScene.moveMainMenuSubscene();
         sceneToHide=subScene;
+    }
+    private void createCarPickerSubscene(){
+        carPickerSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(carPickerSubscene);
+        Button playButton = new Button("PLAY");
+        playButton.setLayoutX(350);
+        playButton.setLayoutY(650);
+        playButton.setPrefWidth(100);
+        playButton.setPrefHeight(50);
+        playButton.setOnAction((event) -> {
+            totalCollectedPointsValue = totalCollectedPointsValue - pickedCar.getPointsRequiredToUnlock();
+            if(pickedCar!=null)
+            {
+                GameViewManager gameViewManager = new GameViewManager();
+                gameViewManager.createNewGame(mainStage,pickedCar);
+            }
+            else{
+                JOptionPane.showMessageDialog(null,"Not choose car");
+            }
+
+        });
+        carPickerSubscene.getPane().getChildren().add(playButton);
+        }
+
+
+    private void createMainMenuSubscenes()
+    {
+        creditsSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(creditsSubscene);
+
+
+
+        createHelpSubScene();
+        createCarPickerSubscene();
+        createLoginSubScene();
+        createLevelPickerSubScene();
+        createScoreSubscene();
     }
 
     private void addMenuButton(GameButton button)
@@ -334,22 +363,15 @@ public class MainMenu
         addMenuButton(startButton);
 
         startButton.setOnAction(e -> {
-            showSubscene(levelPickerSubScene);
-            buttonClickSound.play();
-        });
-        /*startButton.setOnAction(e -> {
-            if(beenLagged == true){
-                showSubscene(levelPickerSubScene);
+            if(userNick != "Not logged in") {
+                showSubscene(carPickerSubscene);
+                buttonClickSound.play();
             }
-            else{
-                showSubscene(loginSubscene);
+            else {
+                showSubscene((loginSubscene));
+                buttonClickSound.play();
             }
         });
-
-         */
-
-
-
 
     }
     private void createHelpButton() throws FileNotFoundException {
@@ -409,32 +431,34 @@ public class MainMenu
                 }
 
             zapis.println("[endUsers]");
+            zapis.println("");
+            zapis.println("[Score]");
+            for (Map.Entry<String, Integer> entry : scoreSave.entrySet()) {
+                zapis.println("<"+entry.getKey()+">");
+                zapis.println(entry.getValue());
+                zapis.println("</"+entry.getKey()+">");
+                zapis.println("");
+            }
+
+            zapis.println("[endScore]");
             zapis.close();
 
             mainStage.close();
+            System.exit(1);
         });
 
     }
-    private void createCarPickerButton() throws FileNotFoundException
+    private void createScoreButton() throws FileNotFoundException
     {
-        GameButton carPickerButton = new GameButton("Cars");
-        addMenuButton(carPickerButton);
+        GameButton scoreButton = new GameButton("SCORE");
+        addMenuButton(scoreButton);
 
-        carPickerButton.setOnAction(e->
-        {
-            showSubscene(carPickerSubscene);
+        scoreButton.setOnAction(e->
+        {   scoreSubscene = null;
+            createScoreSubscene();
+            showSubscene(scoreSubscene);
             buttonClickSound.play();
         });
-        /*carPickerButton.setOnAction(e -> {
-            if(beenLagged == true){
-                showSubscene(carPickerSubscene);
-            }
-            else{
-                showSubscene(loginSubscene);
-            }
-        });
-
-         */
 
     }
     private void createLevel_01Button() throws FileNotFoundException
@@ -447,7 +471,7 @@ public class MainMenu
             public void handle(ActionEvent actionEvent) {
                 if(pickedCar!=null)
                 {
-                    GameViewManagerLevel_01 gameViewManager = new GameViewManagerLevel_01();
+                    GameViewManager gameViewManager = new GameViewManager();
                     gameViewManager.createNewGame(mainStage,pickedCar);
                 }
                 if(pickedCar==null)
@@ -458,38 +482,13 @@ public class MainMenu
         });
 
     }
-    private void createLevel_02Button() throws FileNotFoundException
-    {
-        GameButton level02Button = new GameButton("Level 2");
-        addLevelButton(level02Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_03Button() throws FileNotFoundException
-    {
-        GameButton level03Button = new GameButton("Level 3");
-        addLevelButton(level03Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_04Button() throws FileNotFoundException
-    {
-        GameButton level04Button = new GameButton("Level 4");
-        addLevelButton(level04Button);
 
-        //miejsce na actionListener
-    }
-    private void createLevel_05Button() throws FileNotFoundException
-    {
-        GameButton level05Button = new GameButton("Level 5");
-        addLevelButton(level05Button);
-
-        //miejsce na actionListener
-    }
     private void createButtons() throws FileNotFoundException {
         createLoginButton();
         createStartButton();
-        createCarPickerButton();
+        createScoreButton();
         createHelpButton();
         createCreditsButton();
         createExitButton();
@@ -497,11 +496,89 @@ public class MainMenu
 
 
         createLevel_01Button();
-        createLevel_02Button();
-        createLevel_03Button();
-        createLevel_04Button();
-        createLevel_05Button();
+
     }
 
+    private static HashMap sortByValues(HashMap map) {
+        List list = new LinkedList(map.entrySet());
 
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o2)).getValue())
+                        .compareTo(((Map.Entry) (o1)).getValue());
+            }
+        });
+
+        HashMap sortedHashMap = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
+    }
+
+    public void createHelpSubScene()
+    {
+        helpSubscene = new MainMenuSubscenes();
+        mainPane.getChildren().add(helpSubscene);
+
+        //Setting and displaying stars and bonuses - collectable
+        InfoLabel itemsToCollectLabel = new InfoLabel("Items to collect");
+        itemsToCollectLabel.setLayoutX(100);
+        itemsToCollectLabel.setLayoutY(50);
+
+        HBox itemsToCollectHbox = new HBox();
+        itemsToCollectHbox.setSpacing(30);
+        itemsToCollectHbox.setLayoutX(70);
+        itemsToCollectHbox.setLayoutY(100+20);
+        //itemsToCollectHbox.setPrefSize(540,200);
+
+        helpSubscene.getPane().getChildren().add(itemsToCollectHbox);
+        helpSubscene.getPane().getChildren().addAll(itemsToCollectLabel);
+
+        int resizeValue = 100;
+        ImageView goldStar = Config.goldStar;   goldStar.setFitHeight(resizeValue);  goldStar.setFitWidth(resizeValue);
+        ImageView blueArrow = Config.blueArrow; blueArrow.setFitHeight(resizeValue);    blueArrow.setFitWidth(resizeValue);
+        ImageView greenArrow = Config.greenArrow; greenArrow.setFitHeight(resizeValue); greenArrow.setFitWidth(resizeValue);
+        itemsToCollectHbox.getChildren().addAll(goldStar,blueArrow,greenArrow);
+
+        //Setting and displaying obstacles - items ought to be avoided and destroyed
+        InfoLabel obstaclesLabel = new InfoLabel("Obstacles");
+        helpSubscene.getPane().getChildren().add(obstaclesLabel);
+        obstaclesLabel.setLayoutX(100);
+        obstaclesLabel.setLayoutY(250);
+        HBox obstaclesHbox = new HBox();
+        obstaclesHbox.setSpacing(30);
+        obstaclesHbox.setLayoutX(70);
+        obstaclesHbox.setLayoutY(300+70);
+        helpSubscene.getPane().getChildren().add(obstaclesHbox);
+        ImageView rock = Config.smallObstacleRock;  rock.setFitHeight(70);  rock.setFitWidth(100);
+        ImageView roadBlock = Config.smallObstacleRoadBlock;    roadBlock.setFitHeight(80); roadBlock.setFitWidth(100);
+        ImageView vendingMachine = Config.bigObstacleVendingMachine;    vendingMachine.setFitHeight(150);   vendingMachine.setFitWidth(100);
+        obstaclesHbox.getChildren().addAll(rock,roadBlock,vendingMachine);
+
+        //Setting and displaying controls
+        InfoLabel controlsLabel = new InfoLabel("Controls");
+        ImageView controlsImage = Config.controlsImage;    controlsImage.setFitHeight(120);    controlsImage.setFitWidth(200);
+        controlsImage.setLayoutX(250-20);
+        controlsImage.setLayoutY(630);
+        helpSubscene.getPane().getChildren().add(controlsLabel);
+        helpSubscene.getPane().getChildren().add(controlsImage);
+        controlsLabel.setLayoutX(100);
+        controlsLabel.setLayoutY(550);
+
+        ImageView fireKey = new ImageView("view/resources/fireKey.png");
+        fireKey.setLayoutX(150-15-20);
+        fireKey.setLayoutY(630+5);
+        fireKey.setFitHeight(65);
+        fireKey.setFitWidth(65);
+        helpSubscene.getPane().getChildren().add(fireKey);
+
+
+
+
+
+    }
 }
+
+

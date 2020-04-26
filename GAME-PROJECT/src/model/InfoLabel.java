@@ -57,18 +57,6 @@ public class InfoLabel extends Label
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 

@@ -18,8 +18,9 @@ public class Main extends Application {
         //primaryStage.setScene(new Scene(root, 300, 275));
         //primaryStage.show();
         ConfigFile configFile = new ConfigFile();
-        HashMap<String, Integer> players = configFile.load();
-        MainMenu mainMenu = new MainMenu(players);
+        HashMap<String, Integer> players = configFile.loadPlayers();
+        HashMap<String, Integer> scoreSave = configFile.loadScore();
+        MainMenu mainMenu = new MainMenu(players, scoreSave);
 
         primaryStage = mainMenu.getMainStage();
         primaryStage.show();
