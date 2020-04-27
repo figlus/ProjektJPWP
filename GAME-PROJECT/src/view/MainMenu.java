@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.*;
 
 import javax.swing.*;
@@ -51,7 +52,7 @@ public class MainMenu
     public static String  userNick = "Not logged in";
     public InfoLabel userNickLabel;
 
-    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
     private AnimationTimer mainMenuTimer;
 
 
@@ -246,7 +247,7 @@ public class MainMenu
                 }
             }
             if (been){JOptionPane.showMessageDialog(null, "This user already exists");}
-            else{players.put(test,0); scoreSave.put(test,0); JOptionPane.showMessageDialog(null, "Create Player");}
+            else{players.put(test,0); scoreSave.put(test,0); JOptionPane.showMessageDialog(null, "Player created");}
         });
 
         newNameTextField.setLayoutX(100);

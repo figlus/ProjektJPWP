@@ -235,9 +235,6 @@ public class GameViewManager
 
             }
         }
-
-
-
     }
 
     private void createGameSoundEffects()

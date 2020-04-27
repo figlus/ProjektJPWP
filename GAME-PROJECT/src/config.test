@@ -1,45 +1,37 @@
 [Users]
-<Adam>
-269
-</Adam>
-
-<julia>
-353
-</julia>
+<navy>
+0
+</navy>
 
 <rafal>
-9582
+7619
 </rafal>
 
-<me>
-128
-</me>
+<marcin>
+666
+</marcin>
 
-<mama>
-1116
-</mama>
+<tester_01>
+231
+</tester_01>
 
 [endUsers]
 
 [Score]
 <rafal>
-2588
+2670
 </rafal>
 
-<julia>
-453
-</julia>
+<marcin>
+1798
+</marcin>
 
-<mama>
-450
-</mama>
+<navy>
+0
+</navy>
 
-<Adam>
-144
-</Adam>
-
-<me>
-120
-</me>
+<tester_01>
+231
+</tester_01>
 
 [endScore]
